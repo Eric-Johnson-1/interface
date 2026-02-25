@@ -3,21 +3,21 @@ import { Currency, CurrencyAmount } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
 import { Pool as V3Pool } from '@uniswap/v3-sdk'
 import { Pool as V4Pool } from '@uniswap/v4-sdk'
-import { useNativeTokenPercentageBufferExperiment } from 'components/Liquidity/Create/hooks/useNativeTokenPercentageBufferExperiment'
-import { DepositInfo } from 'components/Liquidity/types'
-import {
-  getDependentAmountFromV2Pair,
-  getDependentAmountFromV3Position,
-  getDependentAmountFromV4Position,
-} from 'components/Liquidity/utils/getDependentAmount'
-import tryParseCurrencyAmount from 'lib/utils/tryParseCurrencyAmount'
 import { useMemo } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { PositionField } from 'types/position'
 import { useMaxAmountSpend } from 'uniswap/src/features/gas/hooks/useMaxAmountSpend'
 import { applyNativeTokenPercentageBuffer } from 'uniswap/src/features/gas/utils'
 import { useOnChainCurrencyBalance } from 'uniswap/src/features/portfolio/api'
 import { useUSDCValue } from 'uniswap/src/features/transactions/hooks/useUSDCPrice'
+import { useNativeTokenPercentageBufferExperiment } from '~/components/Liquidity/Create/hooks/useNativeTokenPercentageBufferExperiment'
+import { DepositInfo } from '~/components/Liquidity/types'
+import {
+  getDependentAmountFromV2Pair,
+  getDependentAmountFromV3Position,
+  getDependentAmountFromV4Position,
+} from '~/components/Liquidity/utils/getDependentAmount'
+import tryParseCurrencyAmount from '~/lib/utils/tryParseCurrencyAmount'
+import { PositionField } from '~/types/position'
 
 type UseDepositInfoProps = {
   protocolVersion: ProtocolVersion

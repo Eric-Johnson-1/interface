@@ -1,8 +1,8 @@
-import { Portal } from 'components/Popups/Portal'
-import { useOnClickOutside } from 'hooks/useOnClickOutside'
 import { RefObject, useCallback, useRef } from 'react'
 import { Checkbox, Flex, styled, Text, useMedia } from 'ui/src'
 import { SortVertical } from 'ui/src/components/icons/SortVertical'
+import { Portal } from '~/components/Popups/Portal'
+import { useOnClickOutside } from '~/hooks/useOnClickOutside'
 
 const FilterDropdown = styled(Flex, {
   position: 'absolute',

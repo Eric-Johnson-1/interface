@@ -4,7 +4,7 @@ import { Button, Flex, GeneratedIcon, getContrastPassingTextColor } from 'ui/src
 import { IconButton } from 'ui/src/components/buttons/IconButton/IconButton'
 import { GridView, X } from 'ui/src/components/icons'
 import { opacify, validColor } from 'ui/src/theme'
-import { ContextMenu, MenuOptionItem } from 'uniswap/src/components/menus/ContextMenuV2'
+import { ContextMenu, MenuOptionItem } from 'uniswap/src/components/menus/ContextMenu'
 import { ContextMenuTriggerMode } from 'uniswap/src/components/menus/types'
 import { TokenList } from 'uniswap/src/features/dataApi/types'
 import { ElementName, MobileEventName, SectionName } from 'uniswap/src/features/telemetry/constants'

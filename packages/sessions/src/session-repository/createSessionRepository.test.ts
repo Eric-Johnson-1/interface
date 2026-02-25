@@ -7,6 +7,7 @@ import {
   SignoutResponse,
 } from '@uniswap/client-platform-service/dist/uniswap/platformservice/v1/sessionService_pb'
 import { createSessionRepository } from '@universe/sessions/src/session-repository/createSessionRepository'
+import { ChallengeType } from '@universe/sessions/src/session-service/types'
 import { describe, expect, it, type MockedFunction, vi } from 'vitest'
 
 type MockedClient = {
@@ -17,6 +18,7 @@ describe('createSessionRepository', () => {
   const createMockClient = (): MockedClient => ({
     initSession: vi.fn().mockResolvedValue({
       sessionId: 'test-session-123',
+      deviceId: 'test-device-123',
       needChallenge: false,
       extra: {},
     }),
@@ -24,9 +26,11 @@ describe('createSessionRepository', () => {
       challengeId: 'challenge-123',
       challengeType: 1,
       extra: { sitekey: 'test-key' },
+      challengeData: { case: undefined },
     }),
     verify: vi.fn().mockResolvedValue({
       retry: false,
+      outcome: { case: 'success' as const, value: {} },
     }),
     updateSession: vi.fn().mockResolvedValue({}),
     deleteSession: vi.fn().mockResolvedValue({}),
@@ -44,6 +48,7 @@ describe('createSessionRepository', () => {
 
       expect(result).toEqual({
         sessionId: 'test-session-123',
+        deviceId: 'test-device-123',
         needChallenge: false,
         extra: {},
       })
@@ -54,6 +59,7 @@ describe('createSessionRepository', () => {
       mockClient.initSession.mockResolvedValue(
         new InitSessionResponse({
           sessionId: undefined,
+          deviceId: undefined,
           needChallenge: true,
           extra: { sitekey: 'turnstile-key' },
         }),
@@ -62,8 +68,9 @@ describe('createSessionRepository', () => {
       const repository = createSessionRepository({ client: mockClient })
       const result = await repository.initSession()
 
-      // Web sessions don't return sessionId (managed by cookies)
+      // Web sessions don't return sessionId or deviceId (managed by cookies)
       expect(result.sessionId).toBeUndefined()
+      expect(result.deviceId).toBeUndefined()
       expect(result.needChallenge).toBe(true)
       expect(result.extra).toEqual({ sitekey: 'turnstile-key' })
     })
@@ -89,6 +96,8 @@ describe('createSessionRepository', () => {
         challengeId: 'challenge-123',
         challengeType: 1,
         extra: { sitekey: 'test-key' },
+        challengeData: { case: undefined },
+        authorizeUrl: undefined,
       })
     })
 
@@ -104,6 +113,8 @@ describe('createSessionRepository', () => {
         challengeId: '',
         challengeType: 0,
         extra: {},
+        challengeData: { case: undefined },
+        authorizeUrl: undefined,
       })
     })
 
@@ -117,52 +128,55 @@ describe('createSessionRepository', () => {
     })
   })
 
-  describe('session upgrade behaviors', () => {
+  describe('session verify behaviors', () => {
     it('submits bot detection solution', async () => {
       const mockClient = createMockClient()
       const repository = createSessionRepository({ client: mockClient as PromiseClient<typeof SessionService> })
 
-      const result = await repository.upgradeSession({
+      const result = await repository.verifySession({
         solution: 'solution-token',
         challengeId: 'challenge-123',
+        challengeType: ChallengeType.TURNSTILE,
       })
 
-      // Verify the client was called correctly
+      // Verify the client was called correctly (challengeType maps to 'type' in the backend API)
       expect(mockClient.verify).toHaveBeenCalledWith({
         solution: 'solution-token',
         challengeId: 'challenge-123',
+        type: ChallengeType.TURNSTILE,
       })
 
       // Should return retry status
       expect(result).toEqual({ retry: false })
     })
 
-    it('handles upgrade with additional parameters', async () => {
+    it('handles verify with additional parameters', async () => {
       const mockClient = createMockClient()
       const repository = createSessionRepository({ client: mockClient as PromiseClient<typeof SessionService> })
 
-      const result = await repository.upgradeSession({
+      const result = await repository.verifySession({
         solution: 'solution-token',
         challengeId: 'challenge-123',
-        walletAddress: '0x123', // Future-proofing for wallet trust
+        challengeType: ChallengeType.TURNSTILE,
       })
 
-      // Should succeed even with extra params
+      // Should succeed with required params
       expect(result).toEqual({ retry: false })
     })
 
-    it('provides meaningful error when upgrade fails', async () => {
+    it('provides meaningful error when verify fails', async () => {
       const mockClient = createMockClient()
       mockClient.verify.mockRejectedValue(new Error('Invalid solution'))
 
       const repository = createSessionRepository({ client: mockClient })
 
       await expect(
-        repository.upgradeSession({
+        repository.verifySession({
           solution: 'bad-token',
           challengeId: 'challenge-123',
+          challengeType: ChallengeType.TURNSTILE,
         }),
-      ).rejects.toThrow('Failed to upgrade session')
+      ).rejects.toThrow('Failed to verify session')
     })
   })
 
@@ -178,7 +192,7 @@ describe('createSessionRepository', () => {
 
     it('provides meaningful error when deletion fails', async () => {
       const mockClient = createMockClient()
-      mockClient.deleteSession.mockRejectedValue(new Error('Server error'))
+      mockClient.signout.mockRejectedValue(new Error('Server error'))
 
       const repository = createSessionRepository({ client: mockClient })
 

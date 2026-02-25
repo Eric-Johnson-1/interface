@@ -4,12 +4,12 @@ import { useSelector } from 'react-redux'
 import { NavigationType, Outlet, ScrollRestoration, useLocation } from 'react-router'
 import { AutoLockProvider } from 'src/app/components/AutoLockProvider'
 import { SmartWalletNudgeModals } from 'src/app/components/modals/SmartWalletNudgeModals'
+import { SmartWalletNudgesProvider } from 'src/app/context/SmartWalletNudgesContext'
 import { DappRequestQueue } from 'src/app/features/dappRequests/DappRequestQueue'
 import { ForceUpgradeModal } from 'src/app/features/forceUpgrade/ForceUpgradeModal'
 import { HomeScreen } from 'src/app/features/home/HomeScreen'
 import { Locked } from 'src/app/features/lockScreen/Locked'
 import { NotificationToastWrapper } from 'src/app/features/notifications/NotificationToastWrapper'
-import { StorageWarningModal } from 'src/app/features/warnings/StorageWarningModal'
 import { useIsWalletUnlocked } from 'src/app/hooks/useIsWalletUnlocked'
 import { AppRoutes } from 'src/app/navigation/constants'
 import { focusOrCreateOnboardingTab } from 'src/app/navigation/focusOrCreateOnboardingTab'
@@ -22,6 +22,7 @@ import { TestnetModeBanner } from 'uniswap/src/components/banners/TestnetModeBan
 import { useIsChromeWindowFocusedWithTimeout } from 'uniswap/src/extension/useIsChromeWindowFocused'
 import { useEvent, usePrevious } from 'utilities/src/react/hooks'
 import { ONE_SECOND_MS } from 'utilities/src/time/time'
+import { AccountsStoreContextProvider } from 'wallet/src/features/accounts/store/provider'
 import { useHeartbeatReporter } from 'wallet/src/features/telemetry/hooks/useHeartbeatReporter'
 import { useLastBalancesReporter } from 'wallet/src/features/telemetry/hooks/useLastBalancesReporter'
 import { WalletUniswapProvider } from 'wallet/src/features/transactions/contexts/WalletUniswapContext'
@@ -40,7 +41,6 @@ export function MainContent(): JSX.Element {
   return (
     <>
       <BackgroundServices />
-      <StorageWarningModal isOnboarding={false} />
       <HomeScreen />
     </>
   )
@@ -152,10 +152,12 @@ export function WebNavigation(): JSX.Element {
     <SidebarNavigationProvider>
       <NativeWalletProvider>
         <WalletUniswapProvider>
-          <NotificationToastWrapper />
-          {shouldRestoreScroll && <ScrollRestoration />}
-          {childrenMemo}
-          {isLoggedIn && <ForceUpgradeModal />}
+          <AccountsStoreContextProvider>
+            <NotificationToastWrapper />
+            {shouldRestoreScroll && <ScrollRestoration />}
+            {childrenMemo}
+            {isLoggedIn && <ForceUpgradeModal />}
+          </AccountsStoreContextProvider>
         </WalletUniswapProvider>
       </NativeWalletProvider>
     </SidebarNavigationProvider>
@@ -235,7 +237,7 @@ function LoggedIn(): JSX.Element {
   const isChromeWindowFocused = useIsChromeWindowFocusedWithTimeout(30 * ONE_SECOND_MS)
 
   return (
-    <>
+    <SmartWalletNudgesProvider>
       {contents}
 
       <QueuedOrderModal />
@@ -245,7 +247,7 @@ function LoggedIn(): JSX.Element {
       <DappRequestQueue />
 
       <SmartWalletNudgeModals />
-    </>
+    </SmartWalletNudgesProvider>
   )
 }
 

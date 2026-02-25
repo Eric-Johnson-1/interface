@@ -78,6 +78,7 @@ export function useGetSwapDelegationInfoForActiveAccount(): (chainId?: UniverseC
     return {
       delegationAddress: delegationDetails?.contractAddress,
       delegationInclusion: delegationDetails?.needsDelegation ?? false,
+      isWalletDelegatedToUniswap: delegationDetails?.isWalletDelegatedToUniswap,
     }
   })
 }

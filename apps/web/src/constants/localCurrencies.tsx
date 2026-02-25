@@ -1,3 +1,6 @@
+import { ReactNode, Suspense } from 'react'
+import { Loader } from 'ui/src/loading/Loader'
+import { FiatCurrency } from 'uniswap/src/features/fiatCurrency/constants'
 import {
   ARS_ICON,
   AUD_ICON,
@@ -21,10 +24,7 @@ import {
   UAH_ICON,
   USD_ICON,
   VND_ICON,
-} from 'constants/localCurrencyIcons'
-import { ReactNode, Suspense } from 'react'
-import { Loader } from 'ui/src/loading/Loader'
-import { FiatCurrency } from 'uniswap/src/features/fiatCurrency/constants'
+} from '~/constants/localCurrencyIcons'
 
 export function getLocalCurrencyIcon(localCurrency: FiatCurrency, size = 20): ReactNode {
   switch (localCurrency) {

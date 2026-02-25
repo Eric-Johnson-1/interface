@@ -1,8 +1,3 @@
-import { Send } from 'components/Icons/Send'
-import { NATIVE_CHAIN_ID } from 'constants/tokens'
-import { useActiveAccount, useConnectionStatus } from 'features/accounts/store/hooks'
-import useSelectChain from 'hooks/useSelectChain'
-import { useTDPContext } from 'pages/TokenDetails/TDPContext'
 import { useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router'
@@ -11,6 +6,11 @@ import { ArrowDownCircle } from 'ui/src/components/icons/ArrowDownCircle'
 import { ArrowUpCircle } from 'ui/src/components/icons/ArrowUpCircle'
 import { isEVMChain } from 'uniswap/src/features/platforms/utils/chains'
 import { useShouldShowAztecWarning } from 'uniswap/src/hooks/useShouldShowAztecWarning'
+import { Send } from '~/components/Icons/Send'
+import { NATIVE_CHAIN_ID } from '~/constants/tokens'
+import { useActiveAccount, useConnectionStatus } from '~/features/accounts/store/hooks'
+import useSelectChain from '~/hooks/useSelectChain'
+import { useTDPContext } from '~/pages/TokenDetails/context/TDPContext'
 
 type TabItem = {
   label?: string

@@ -1,4 +1,5 @@
 import { Currency, CurrencyAmount } from '@uniswap/sdk-core'
+import { GasFeeResult } from '@universe/api'
 import { useTranslation } from 'react-i18next'
 import { Flex, Text, UniswapXText } from 'ui/src'
 import { UniswapX } from 'ui/src/components/icons/UniswapX'
@@ -12,7 +13,6 @@ import {
   useGasFeeFormattedDisplayAmounts,
   useGasFeeHighRelativeToValue,
 } from 'uniswap/src/features/gas/hooks'
-import { GasFeeResult } from 'uniswap/src/features/gas/types'
 import { usePriceUXEnabled } from 'uniswap/src/features/transactions/swap/hooks/usePriceUXEnabled'
 import { UniswapXGasBreakdown } from 'uniswap/src/features/transactions/swap/types/swapTxAndGasInfo'
 import { isWebApp } from 'utilities/src/platform'

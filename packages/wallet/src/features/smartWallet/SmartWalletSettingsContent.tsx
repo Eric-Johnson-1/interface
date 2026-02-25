@@ -59,7 +59,7 @@ function WalletItem({ wallet, onPress }: { wallet: WalletData; onPress: (wallet:
         </Text>
       )
     }
-    return <RotatableChevron color="$neutral3" direction="right" height={iconSizes.icon20} width={iconSizes.icon20} />
+    return <RotatableChevron color="$neutral3" direction="right" size="$icon.20" />
   }, [isInactive, isUnavailable, onPressCallback, t])
 
   const displayName = useDisplayName(wallet.walletAddress)

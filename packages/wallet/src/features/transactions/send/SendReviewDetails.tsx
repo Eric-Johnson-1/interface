@@ -296,12 +296,10 @@ export function SendReviewDetails({
       <TransactionDetails
         AccountDetails={
           <Flex row alignItems="center" justifyContent="space-between">
-            <Text color="$neutral2" variant="body3">
+            <Text color="$neutral2" variant="body3" pr="$spacing8">
               {t('common.wallet.label')}
             </Text>
             <AddressDisplay
-              disableForcedWidth
-              flexGrow={false}
               address={account.address}
               hideAddressInSubtitle={true}
               horizontalGap="$spacing4"

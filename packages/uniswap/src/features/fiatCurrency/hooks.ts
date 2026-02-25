@@ -117,7 +117,7 @@ export function useFiatCurrencyInfo(currency: FiatCurrency): FiatCurrencyInfo {
 function useUrlLocalCurrency(): FiatCurrency | undefined {
   const { useParsedQueryString } = useUrlContext()
   const parsed = useParsedQueryString()
-  const parsedLocalCurrency = parsed.cur
+  const parsedLocalCurrency = parsed['cur']
 
   if (typeof parsedLocalCurrency !== 'string') {
     return undefined

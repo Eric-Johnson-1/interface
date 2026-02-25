@@ -1,9 +1,9 @@
-import { expect, getTest } from 'playwright/fixtures'
-import { stubTradingApiEndpoint } from 'playwright/fixtures/tradingApi'
 import { USDC_MAINNET } from 'uniswap/src/constants/tokens'
 import { uniswapUrls } from 'uniswap/src/constants/urls'
 import { TestID } from 'uniswap/src/test/fixtures/testIDs'
-import { assume0xAddress } from 'utils/wagmi'
+import { expect, getTest } from '~/playwright/fixtures'
+import { stubTradingApiEndpoint } from '~/playwright/fixtures/tradingApi'
+import { assume0xAddress } from '~/utils/wagmi'
 
 const test = getTest({ withAnvil: true })
 

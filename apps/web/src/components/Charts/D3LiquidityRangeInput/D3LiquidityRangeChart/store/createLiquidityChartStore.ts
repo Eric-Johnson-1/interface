@@ -1,15 +1,18 @@
 import { GraphQLApi } from '@universe/api'
-import { CHART_BEHAVIOR } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
-import { createDragActions } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/actions/dragActions'
-import { createPriceActions } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/actions/priceActions'
-import { createRenderActions } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/actions/renderActions'
-import { createViewActions } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/actions/viewActions'
-import { ChartState, ChartStoreState } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
-import { ChartEntry } from 'components/Charts/LiquidityRangeInput/types'
-import { RangeAmountInputPriceMode } from 'components/Liquidity/Create/types'
 import type { StoreApi, UseBoundStore } from 'zustand'
 import { create } from 'zustand'
 import { devtools, subscribeWithSelector } from 'zustand/middleware'
+import { CHART_BEHAVIOR } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
+import { createDragActions } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/actions/dragActions'
+import { createPriceActions } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/actions/priceActions'
+import { createRenderActions } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/actions/renderActions'
+import { createViewActions } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/actions/viewActions'
+import {
+  ChartState,
+  ChartStoreState,
+} from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
+import { ChartEntry } from '~/components/Charts/LiquidityRangeInput/types'
+import { RangeAmountInputPriceMode } from '~/components/Liquidity/Create/types'
 
 // Organized initial state by domain
 const INITIAL_VIEW_STATE = {

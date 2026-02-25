@@ -1,11 +1,13 @@
-import { CHART_DIMENSIONS } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
+import * as d3 from 'd3'
+import { CHART_DIMENSIONS } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
 import type {
   ChartActions,
   ChartState,
   Renderer,
   RenderingContext,
-} from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
-import * as d3 from 'd3'
+} from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
+
+import { findClosestTick } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/tickUtils'
 
 export function createLiquidityBarsOverlayRenderer({
   g,
@@ -138,8 +140,11 @@ export function createLiquidityBarsOverlayRenderer({
       }
 
       if (isEnd) {
-        handlePriceChange('min', constrainedMinPrice)
-        handlePriceChange('max', constrainedMaxPrice)
+        const { tick: minTickEntry } = findClosestTick(liquidityData, constrainedMinPrice)
+        const { tick: maxTickEntry } = findClosestTick(liquidityData, constrainedMaxPrice)
+
+        handlePriceChange({ changeType: 'min', price: constrainedMinPrice, tick: minTickEntry.tick })
+        handlePriceChange({ changeType: 'max', price: constrainedMaxPrice, tick: maxTickEntry.tick })
 
         setChartState({ dragStartY: null, dragCurrentTick: undefined })
       }

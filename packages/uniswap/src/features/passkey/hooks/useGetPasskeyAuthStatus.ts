@@ -8,7 +8,7 @@ export function useGetPasskeyAuthStatus(connectionType: string | undefined): Pas
 
   const { data: isSessionAuthenticated = false } = useQuery({
     queryKey: [ReactQueryCacheKey.PasskeyAuthStatus, isSignedInWithPasskey],
-    queryFn: () => isSessionAuthenticatedForAction(Action.SIGN_TRANSACTIONS),
+    queryFn: () => isSessionAuthenticatedForAction(Action.SIGN_TRANSACTION),
     enabled: isSignedInWithPasskey,
     gcTime: 0,
     staleTime: 0,

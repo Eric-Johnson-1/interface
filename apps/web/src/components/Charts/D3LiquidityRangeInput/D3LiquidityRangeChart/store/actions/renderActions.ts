@@ -1,20 +1,20 @@
-import { CHART_BEHAVIOR } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
-import { createCurrentTickRenderer } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/renderers/CurrentTickRenderer'
-import { createLiquidityBarsOverlayRenderer } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/renderers/LiquidityBarsOverlayRenderer'
-import { createLiquidityBarsRenderer } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/renderers/LiquidityBarsRenderer'
-import { createLiquidityRangeAreaRenderer } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/renderers/LiquidityRangeAreaRenderer'
-import { createMinMaxPriceIndicatorsRenderer } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/renderers/MinMaxPriceIndicatorsRenderer'
-import { createMinMaxPriceLineRenderer } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/renderers/MinMaxPriceLineRenderer'
-import { createPriceLineRenderer } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/renderers/PriceLineRenderer'
-import { createScrollbarContainerRenderer } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/renderers/ScrollbarContainerRenderer'
-import { createTimescaleRenderer } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/renderers/TimescaleRenderer'
+import { CHART_BEHAVIOR } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
+import { createCurrentTickRenderer } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/renderers/CurrentTickRenderer'
+import { createLiquidityBarsOverlayRenderer } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/renderers/LiquidityBarsOverlayRenderer'
+import { createLiquidityBarsRenderer } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/renderers/LiquidityBarsRenderer'
+import { createLiquidityRangeAreaRenderer } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/renderers/LiquidityRangeAreaRenderer'
+import { createMinMaxPriceIndicatorsRenderer } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/renderers/MinMaxPriceIndicatorsRenderer'
+import { createMinMaxPriceLineRenderer } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/renderers/MinMaxPriceLineRenderer'
+import { createPriceLineRenderer } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/renderers/PriceLineRenderer'
+import { createScrollbarContainerRenderer } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/renderers/ScrollbarContainerRenderer'
+import { createTimescaleRenderer } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/renderers/TimescaleRenderer'
 import type {
   AnimationParams,
   ChartStoreState,
   RenderingContext,
-} from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
-import { getClosestTick } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/getClosestTick'
-import * as d3 from 'd3'
+} from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
+
+import { findClosestTick } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/tickUtils'
 
 export const createRenderActions = (
   set: (fn: (state: ChartStoreState) => ChartStoreState) => void,
@@ -150,14 +150,16 @@ export const createRenderActions = (
         currentMaxPrice = startMaxPrice + (targetMaxPrice - startMaxPrice) * easeProgress
       }
 
-      const { tick: minTick } = getClosestTick(renderingContext.liquidityData, currentMinPrice)
-      const { tick: maxTick } = getClosestTick(renderingContext.liquidityData, currentMaxPrice)
+      const { tick: minTick } = findClosestTick(renderingContext.liquidityData, currentMinPrice)
+      const { tick: maxTick } = findClosestTick(renderingContext.liquidityData, currentMaxPrice)
       set((state) => ({
         ...state,
         zoomLevel: currentZoom,
         panY: currentPan,
         minPrice: minTick.price0,
         maxPrice: maxTick.price0,
+        minTick: minTick.tick,
+        maxTick: maxTick.tick,
       }))
       if (progress < 1) {
         requestAnimationFrame(animate)

@@ -1,3 +1,4 @@
+import { FormattedUniswapXGasFeeInfo } from '@universe/api'
 import { PropsWithChildren } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { Flex, Separator, Text, UniswapXText, useSporeColors } from 'ui/src'
@@ -17,7 +18,6 @@ import { InfoTooltipProps } from 'uniswap/src/components/tooltip/InfoTooltipProp
 import { uniswapUrls } from 'uniswap/src/constants/urls'
 import { getChainInfo } from 'uniswap/src/features/chains/chainInfo'
 import { UniverseChainId } from 'uniswap/src/features/chains/types'
-import { FormattedUniswapXGasFeeInfo } from 'uniswap/src/features/gas/types'
 import { NetworkCostBanner } from 'uniswap/src/features/smartWallet/banner/NetworkCostBanner'
 import { ModalName } from 'uniswap/src/features/telemetry/constants'
 import { usePriceUXEnabled } from 'uniswap/src/features/transactions/swap/hooks/usePriceUXEnabled'

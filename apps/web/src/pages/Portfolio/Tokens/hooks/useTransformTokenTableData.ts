@@ -1,13 +1,16 @@
 import { NetworkStatus } from '@apollo/client'
-import { usePortfolioAddresses } from 'pages/Portfolio/hooks/usePortfolioAddresses'
 import { useMemo } from 'react'
 import { UniverseChainId } from 'uniswap/src/features/chains/types'
 import { useSortedPortfolioBalances } from 'uniswap/src/features/dataApi/balances/balances'
 import type { PortfolioBalance } from 'uniswap/src/features/dataApi/types'
 import { CurrencyInfo } from 'uniswap/src/features/dataApi/types'
+import { TestID } from 'uniswap/src/test/fixtures/testIDs'
+import { currencyId } from 'uniswap/src/utils/currencyId'
+import { usePortfolioAddresses } from '~/pages/Portfolio/hooks/usePortfolioAddresses'
 
 export interface TokenData {
   id: string
+  testId: string
   currencyInfo: CurrencyInfo | null // Full currency info including logoUrl
   price: number
   change1d: number | undefined
@@ -73,9 +76,11 @@ export function useTransformTokenTableData({ chainIds, limit }: { chainIds?: Uni
     const mapBalanceToTokenData = (balance: PortfolioBalance, allocationFromTotal?: number): TokenData => {
       const balanceUSD = balance.balanceUSD ?? 0
       const priceRaw = balanceUSD > 0 && balance.quantity > 0 ? balanceUSD / balance.quantity : 0
+      const rowId = currencyId(balance.currencyInfo.currency)
 
       return {
         id: balance.id,
+        testId: `${TestID.TokenTableRowPrefix}${rowId}`,
         currencyInfo: balance.currencyInfo,
         price: priceRaw,
         change1d: balance.relativeChange24 || undefined,

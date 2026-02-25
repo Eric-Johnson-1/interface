@@ -28,10 +28,15 @@ function useMarketPrice(baseCurrency?: Currency, quoteCurrency?: Currency) {
     return undefined
   }
 
-  const marketPrice = new Fraction(
-    baseCurrencyUSDPrice.multiply(DECIMAL_SCALAR).toFixed(0),
-    quoteCurrencyUSDPrice.multiply(DECIMAL_SCALAR).toFixed(0),
-  )
+  const numerator = baseCurrencyUSDPrice.multiply(DECIMAL_SCALAR).toFixed(0)
+  const denominator = quoteCurrencyUSDPrice.multiply(DECIMAL_SCALAR).toFixed(0)
+
+  // Avoid division by zero when the denominator rounds to 0
+  if (denominator === '0') {
+    return undefined
+  }
+
+  const marketPrice = new Fraction(numerator, denominator)
 
   return marketPrice
 }

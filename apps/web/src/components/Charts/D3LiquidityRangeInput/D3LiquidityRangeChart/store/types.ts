@@ -1,12 +1,12 @@
 import { ProtocolVersion } from '@uniswap/client-data-api/dist/data/v1/poolTypes_pb'
 import { Currency } from '@uniswap/sdk-core'
 import { GraphQLApi } from '@universe/api'
-import { TickAlignment } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/priceToY'
-import { ChartEntry } from 'components/Charts/LiquidityRangeInput/types'
-import { PriceChartData } from 'components/Charts/PriceChart'
-import { RangeAmountInputPriceMode } from 'components/Liquidity/Create/types'
 import * as d3 from 'd3'
 import { UseSporeColorsReturn } from 'ui/src/hooks/useSporeColors'
+import { TickAlignment } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/priceToY'
+import { ChartEntry } from '~/components/Charts/LiquidityRangeInput/types'
+import { PriceChartData } from '~/components/Charts/PriceChart'
+import { RangeAmountInputPriceMode } from '~/components/Liquidity/Create/types'
 
 export type TickNavigationParams = {
   tickSpacing: number
@@ -35,7 +35,9 @@ export type ChartState = {
   isChartHovered?: boolean
   isFullRange: boolean
   maxPrice?: number
+  maxTick?: number
   minPrice?: number
+  minTick?: number
   panY: number
   selectedHistoryDuration: GraphQLApi.HistoryDuration
   selectedPriceStrategy?: DefaultPriceStrategy
@@ -98,7 +100,7 @@ export type ChartActions = {
   setTimePeriod: (timePeriod: GraphQLApi.HistoryDuration) => void
   syncIsFullRangeFromParent: (isFullRange: boolean) => void
   updateDimensions: (dimensions: { width: number; height: number }) => void
-  handlePriceChange: (changeType: 'min' | 'max', price?: number) => void
+  handlePriceChange: ({ changeType, price, tick }: { changeType: 'min' | 'max'; price?: number; tick?: number }) => void
   initializeView: (params?: { minPrice: number | null; maxPrice: number | null }) => void
   initializeRenderers: ({
     g,

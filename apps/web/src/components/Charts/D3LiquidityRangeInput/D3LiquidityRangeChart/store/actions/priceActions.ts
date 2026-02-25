@@ -1,20 +1,23 @@
-import { CHART_BEHAVIOR } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
+import { CHART_BEHAVIOR } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
 import type {
   ChartStoreState,
   TickNavigationParams,
-} from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
-import { DefaultPriceStrategy } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
-import { getClosestTick } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/getClosestTick'
+} from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
+
+import { DefaultPriceStrategy } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
 import {
   calculateStrategyPrices,
   detectPriceStrategy,
-} from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/priceStrategies'
-import { calculateRangeViewport } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/rangeViewportUtils'
-import { navigateTick } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/tickUtils'
+} from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/priceStrategies'
+import { calculateRangeViewport } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/rangeViewportUtils'
+import {
+  findClosestTick,
+  navigateTick,
+} from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/tickUtils'
 
 interface PriceActionCallbacks {
-  onMinPriceChange: (price?: number) => void
-  onMaxPriceChange: (price?: number) => void
+  onMinPriceChange: (price?: number, tick?: number) => void
+  onMaxPriceChange: (price?: number, tick?: number) => void
 }
 
 export const createPriceActions = ({
@@ -29,11 +32,11 @@ export const createPriceActions = ({
   // WARNING: This function will cause the CreateLiquidityContext to re-render.
   // Use this sparingly when a user action is complete (i.e drag ends).
   // This function should not react to min/max state changes.
-  handlePriceChange: (changeType: 'min' | 'max', price?: number) => {
+  handlePriceChange: ({ changeType, price, tick }: { changeType: 'min' | 'max'; price?: number; tick?: number }) => {
     if (changeType === 'min') {
-      callbacks.onMinPriceChange(price)
+      callbacks.onMinPriceChange(price, tick)
     } else {
-      callbacks.onMaxPriceChange(price)
+      callbacks.onMaxPriceChange(price, tick)
     }
 
     const { maxPrice, minPrice, selectedPriceStrategy, renderingContext } = get()
@@ -79,8 +82,8 @@ export const createPriceActions = ({
       defaultMaxPrice,
     })
 
-    const { index: minTickIndex } = getClosestTick(liquidityData, targetMinPrice)
-    const { index: maxTickIndex } = getClosestTick(liquidityData, targetMaxPrice)
+    const { index: minTickIndex, tick: minTickEntry } = findClosestTick(liquidityData, targetMinPrice)
+    const { index: maxTickIndex, tick: maxTickEntry } = findClosestTick(liquidityData, targetMaxPrice)
 
     const { targetZoom, targetPanY } = calculateRangeViewport({
       minTickIndex,
@@ -103,12 +106,17 @@ export const createPriceActions = ({
         panY: targetPanY,
         minPrice: targetMinPrice,
         maxPrice: targetMaxPrice,
+        minTick: minTickEntry.tick,
+        maxTick: maxTickEntry.tick,
       })
     }
 
     setTimeout(() => {
-      actions.handlePriceChange('min', targetMinPrice)
-      actions.handlePriceChange('max', targetMaxPrice)
+      const { renderingContext } = get()
+      if (renderingContext) {
+        actions.handlePriceChange({ changeType: 'min', price: targetMinPrice, tick: minTickEntry.tick })
+        actions.handlePriceChange({ changeType: 'max', price: targetMaxPrice, tick: maxTickEntry.tick })
+      }
     }, CHART_BEHAVIOR.ANIMATION_DURATION)
   },
 
@@ -135,8 +143,16 @@ export const createPriceActions = ({
     })
 
     if (newPrice !== undefined) {
-      actions.setChartState({ maxPrice: newPrice })
-      actions.handlePriceChange('max', newPrice)
+      const { renderingContext } = get()
+      let tick: number | undefined
+
+      if (renderingContext) {
+        const { tick: tickEntry } = findClosestTick(renderingContext.liquidityData, newPrice)
+        tick = tickEntry.tick
+      }
+
+      actions.setChartState({ maxPrice: newPrice, maxTick: tick })
+      actions.handlePriceChange({ changeType: 'max', price: newPrice, tick })
     }
   },
 
@@ -163,8 +179,16 @@ export const createPriceActions = ({
     })
 
     if (newPrice !== undefined) {
-      actions.setChartState({ maxPrice: newPrice })
-      actions.handlePriceChange('max', newPrice)
+      const { renderingContext } = get()
+      let tick: number | undefined
+
+      if (renderingContext) {
+        const { tick: tickEntry } = findClosestTick(renderingContext.liquidityData, newPrice)
+        tick = tickEntry.tick
+      }
+
+      actions.setChartState({ maxPrice: newPrice, maxTick: tick })
+      actions.handlePriceChange({ changeType: 'max', price: newPrice, tick })
     }
   },
 
@@ -191,8 +215,16 @@ export const createPriceActions = ({
     })
 
     if (newPrice !== undefined) {
-      actions.setChartState({ minPrice: newPrice })
-      actions.handlePriceChange('min', newPrice)
+      const { renderingContext } = get()
+      let tick: number | undefined
+
+      if (renderingContext) {
+        const { tick: tickEntry } = findClosestTick(renderingContext.liquidityData, newPrice)
+        tick = tickEntry.tick
+      }
+
+      actions.setChartState({ minPrice: newPrice, minTick: tick })
+      actions.handlePriceChange({ changeType: 'min', price: newPrice, tick })
     }
   },
 
@@ -219,8 +251,16 @@ export const createPriceActions = ({
     })
 
     if (newPrice !== undefined) {
-      actions.setChartState({ minPrice: newPrice })
-      actions.handlePriceChange('min', newPrice)
+      const { renderingContext } = get()
+      let tick: number | undefined
+
+      if (renderingContext) {
+        const { tick: tickEntry } = findClosestTick(renderingContext.liquidityData, newPrice)
+        tick = tickEntry.tick
+      }
+
+      actions.setChartState({ minPrice: newPrice, minTick: tick })
+      actions.handlePriceChange({ changeType: 'min', price: newPrice, tick })
     }
   },
 

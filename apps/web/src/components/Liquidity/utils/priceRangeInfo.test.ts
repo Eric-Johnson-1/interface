@@ -3,26 +3,26 @@ import { Currency, CurrencyAmount, Price } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
 import { FeeAmount, nearestUsableTick, TICK_SPACINGS, TickMath, Pool as V3Pool } from '@uniswap/v3-sdk'
 import { Pool as V4Pool } from '@uniswap/v4-sdk'
+import JSBI from 'jsbi'
+import { ZERO_ADDRESS } from 'uniswap/src/constants/misc'
+import { nativeOnChain, USDT } from 'uniswap/src/constants/tokens'
+import { UniverseChainId } from 'uniswap/src/features/chains/types'
 import {
   CreateV2PositionInfo,
   CreateV3PositionInfo,
   CreateV4PositionInfo,
   PositionState,
   PriceRangeState,
-} from 'components/Liquidity/Create/types'
+} from '~/components/Liquidity/Create/types'
 import {
   getFieldsDisabled,
   getV2PriceRangeInfo,
   getV3PriceRangeInfo,
   getV4PriceRangeInfo,
-} from 'components/Liquidity/utils/priceRangeInfo'
-import JSBI from 'jsbi'
-import tryParseCurrencyAmount from 'lib/utils/tryParseCurrencyAmount'
-import { ETH_MAINNET } from 'test-utils/constants'
-import { ZERO_ADDRESS } from 'uniswap/src/constants/misc'
-import { nativeOnChain, USDT } from 'uniswap/src/constants/tokens'
-import { UniverseChainId } from 'uniswap/src/features/chains/types'
-import { getTickToPrice, getV4TickToPrice } from 'utils/getTickToPrice'
+} from '~/components/Liquidity/utils/priceRangeInfo'
+import tryParseCurrencyAmount from '~/lib/utils/tryParseCurrencyAmount'
+import { ETH_MAINNET } from '~/test-utils/constants'
+import { getTickToPrice, getV4TickToPrice } from '~/utils/getTickToPrice'
 
 const WETH = nativeOnChain(UniverseChainId.Mainnet).wrapped
 

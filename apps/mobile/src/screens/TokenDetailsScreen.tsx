@@ -1,3 +1,5 @@
+/* eslint-disable max-lines */
+
 import { useApolloClient } from '@apollo/client'
 import { ReactNavigationPerformanceView } from '@shopify/react-native-performance-navigation'
 import { GQLQueries, GraphQLApi } from '@universe/api'
@@ -28,11 +30,12 @@ import { Flex, Separator, Text } from 'ui/src'
 import { ArrowDownCircle, ArrowUpCircle, Bank, SendRoundedAirplane } from 'ui/src/components/icons'
 import { AnimatedFlex } from 'ui/src/components/layout/AnimatedFlex'
 import { BaseCard } from 'uniswap/src/components/BaseCard/BaseCard'
-import type { MenuOptionItem } from 'uniswap/src/components/menus/ContextMenuV2'
+import type { MenuOptionItem } from 'uniswap/src/components/menus/ContextMenu'
 import { WarningSeverity } from 'uniswap/src/components/modals/WarningModal/types'
 import { WarningModal } from 'uniswap/src/components/modals/WarningModal/WarningModal'
 import { LearnMoreLink } from 'uniswap/src/components/text/LearnMoreLink'
 import { PollingInterval } from 'uniswap/src/constants/misc'
+import { uniswapUrls } from 'uniswap/src/constants/urls'
 import { useCrossChainBalances } from 'uniswap/src/data/balances/hooks/useCrossChainBalances'
 import {
   useTokenBasicInfoPartsFragment,
@@ -51,7 +54,6 @@ import { ModalName } from 'uniswap/src/features/telemetry/constants'
 import Trace from 'uniswap/src/features/telemetry/Trace'
 import { TokenWarningCard } from 'uniswap/src/features/tokens/warnings/TokenWarningCard'
 import TokenWarningModal from 'uniswap/src/features/tokens/warnings/TokenWarningModal'
-import { AZTEC_URL } from 'uniswap/src/features/transactions/swap/hooks/useSwapWarnings/getAztecUnavailableWarning'
 import { useAppInsets } from 'uniswap/src/hooks/useAppInsets'
 import { useShouldShowAztecWarning } from 'uniswap/src/hooks/useShouldShowAztecWarning'
 import type { CurrencyField } from 'uniswap/src/types/currency'
@@ -59,8 +61,11 @@ import { MobileScreens } from 'uniswap/src/types/screens/mobile'
 import { AddressStringFormat, normalizeAddress } from 'uniswap/src/utils/addresses'
 import { buildCurrencyId, isNativeCurrencyAddress } from 'uniswap/src/utils/currencyId'
 import { useEvent } from 'utilities/src/react/hooks'
+import { useDelayedRender } from 'utilities/src/react/useDelayedRender'
 import { useWalletNavigation } from 'wallet/src/contexts/WalletNavigationContext'
 import { useActiveAccountAddressWithThrow } from 'wallet/src/features/wallet/hooks'
+
+const CONTEXT_MENU_RENDER_DELAY_MS = 1000
 
 export function TokenDetailsScreen({ route, navigation }: AppStackScreenProp<MobileScreens.TokenDetails>): JSX.Element {
   const { currencyId } = route.params
@@ -113,6 +118,7 @@ const TokenDetailsQuery = memo(function _TokenDetailsQuery(): JSX.Element {
 const TokenDetails = memo(function _TokenDetails(): JSX.Element {
   const centerElement = useMemo(() => <HeaderTitleElement />, [])
   const rightElement = useMemo(() => <HeaderRightElement />, [])
+  const { isContentHidden } = useDelayedRender(CONTEXT_MENU_RENDER_DELAY_MS)
 
   const inModal = useIsInModal(MobileScreens.Explore, true)
 
@@ -122,7 +128,8 @@ const TokenDetails = memo(function _TokenDetails(): JSX.Element {
         showHandleBar={inModal}
         renderedInModal={inModal}
         centerElement={centerElement}
-        rightElement={rightElement}
+        // Delay rendering to avoid mounting context menu to the previous screen
+        rightElement={isContentHidden ? undefined : rightElement}
       >
         <Flex gap="$spacing16" pb="$spacing16">
           <Flex gap="$spacing16">
@@ -240,13 +247,18 @@ const TokenDetailsModals = memo(function _TokenDetailsModals(): JSX.Element {
           isOpen={isAztecWarningModalOpen}
           modalName={ModalName.SwapWarning}
           severity={WarningSeverity.Blocked}
-          title={t('swap.warning.aztecUnavailable.title')}
+          title={t('swap.warning.noRoutesFound.title')}
           captionComponent={
             <>
               <Text color="$neutral2" textAlign="center" variant="body3">
                 {t('swap.warning.aztecUnavailable.message')}
               </Text>
-              <LearnMoreLink display="inline" textColor="$neutral1" textVariant="buttonLabel3" url={AZTEC_URL} />
+              <LearnMoreLink
+                display="inline"
+                textColor="$neutral1"
+                textVariant="buttonLabel3"
+                url={uniswapUrls.aztecUrl}
+              />
             </>
           }
           acknowledgeText={t('common.button.close')}

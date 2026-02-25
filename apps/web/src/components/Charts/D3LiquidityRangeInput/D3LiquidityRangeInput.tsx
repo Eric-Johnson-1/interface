@@ -1,26 +1,26 @@
 import { ProtocolVersion } from '@uniswap/client-data-api/dist/data/v1/poolTypes_pb'
 import { Currency, Price } from '@uniswap/sdk-core'
 import { GraphQLApi } from '@universe/api'
-import { D3LiquidityChartHeader } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/components/D3LiquidityChartHeader'
-import { D3LiquidityMinMaxInput } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/components/D3LiquidityMinMaxInput'
-import { DefaultPriceStrategies } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/components/DefaultPriceStrategies'
-import { LiquidityRangeActionButtons } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/components/LiquidityRangeActionButtons/LiquidityRangeActionButtons'
-import { CHART_DIMENSIONS } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
-import D3LiquidityRangeChart from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/D3LiquidityRangeChart'
-import { LiquidityChartStoreProvider } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/LiquidityChartStoreProvider'
-import { useDensityChartData } from 'components/Charts/LiquidityRangeInput/hooks'
-import { ChartEntry } from 'components/Charts/LiquidityRangeInput/types'
-import { ChartSkeleton } from 'components/Charts/LoadingState'
-import { PriceChartData } from 'components/Charts/PriceChart'
-import { ChartType } from 'components/Charts/utils'
-import { InitialPosition, RangeAmountInputPriceMode } from 'components/Liquidity/Create/types'
-import { usePoolPriceChartData } from 'hooks/usePoolPriceChartData'
 import { UTCTimestamp } from 'lightweight-charts'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Flex, SegmentedControlOption, Shine, Text } from 'ui/src'
 import { ZERO_ADDRESS } from 'uniswap/src/constants/misc'
 import { getChainInfo } from 'uniswap/src/features/chains/chainInfo'
+import { D3LiquidityChartHeader } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/components/D3LiquidityChartHeader'
+import { D3LiquidityMinMaxInput } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/components/D3LiquidityMinMaxInput'
+import { DefaultPriceStrategies } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/components/DefaultPriceStrategies'
+import { LiquidityRangeActionButtons } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/components/LiquidityRangeActionButtons/LiquidityRangeActionButtons'
+import { CHART_DIMENSIONS } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
+import D3LiquidityRangeChart from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/D3LiquidityRangeChart'
+import { LiquidityChartStoreProvider } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/LiquidityChartStoreProvider'
+import { useDensityChartData } from '~/components/Charts/LiquidityRangeInput/hooks'
+import { ChartEntry } from '~/components/Charts/LiquidityRangeInput/types'
+import { ChartSkeleton } from '~/components/Charts/LoadingState'
+import { PriceChartData } from '~/components/Charts/PriceChart'
+import { ChartType } from '~/components/Charts/utils'
+import { InitialPosition, RangeAmountInputPriceMode } from '~/components/Liquidity/Create/types'
+import { usePoolPriceChartData } from '~/hooks/usePoolPriceChartData'
 
 const MIN_DATA_POINTS = 5
 
@@ -76,8 +76,8 @@ export function D3LiquidityRangeInput({
   inputMode?: RangeAmountInputPriceMode
   initialPosition?: InitialPosition
   setInputMode: (inputMode: RangeAmountInputPriceMode) => void
-  setMinPrice: (minPrice?: number | null) => void
-  setMaxPrice: (maxPrice?: number | null) => void
+  setMinPrice: (price?: number | null, tick?: number) => void
+  setMaxPrice: (price?: number | null, tick?: number) => void
   setIsFullRange: (isFullRange: boolean) => void
   handleSelectToken: (option: string) => void
 }) {

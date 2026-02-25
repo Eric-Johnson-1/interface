@@ -1,13 +1,13 @@
 import { Currency } from '@uniswap/sdk-core'
-import { TickTooltip } from 'components/Charts/ActiveLiquidityChart/TickTooltip'
-import { PriceDifferenceTooltips } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/components/PriceDifferenceTooltips'
-import { CHART_DIMENSIONS } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
-import { useChartDragState } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/selectors/dragSelectors'
-import { useChartHoverState } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/selectors/hoverSelectors'
-import { getClosestTick } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/getClosestTick'
-import { ChartEntry } from 'components/Charts/LiquidityRangeInput/types'
-import { PriceChartData } from 'components/Charts/PriceChart'
 import { useMemo } from 'react'
+import { TickTooltip } from '~/components/Charts/ActiveLiquidityChart/TickTooltip'
+import { PriceDifferenceTooltips } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/components/PriceDifferenceTooltips'
+import { CHART_DIMENSIONS } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
+import { useChartDragState } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/selectors/dragSelectors'
+import { useChartHoverState } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/selectors/hoverSelectors'
+import { findClosestTick } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/tickUtils'
+import { ChartEntry } from '~/components/Charts/LiquidityRangeInput/types'
+import { PriceChartData } from '~/components/Charts/PriceChart'
 
 export function LiquidityActiveTooltips({
   quoteCurrency,
@@ -32,7 +32,7 @@ export function LiquidityActiveTooltips({
   }, [priceData])
 
   const { tick: currentTick } = useMemo(() => {
-    return getClosestTick(liquidityData, currentPrice).tick
+    return findClosestTick(liquidityData, currentPrice)
   }, [currentPrice, liquidityData])
 
   // Calculate content width and axis label pane width
@@ -50,7 +50,7 @@ export function LiquidityActiveTooltips({
           containerHeight={CHART_DIMENSIONS.LIQUIDITY_CHART_HEIGHT}
           hoverY={hoveredY}
           hoveredTick={hoveredTick}
-          currentTick={currentTick}
+          currentTick={currentTick.tick}
           currentPrice={currentPrice}
           contentWidth={contentWidth}
           axisLabelPaneWidth={axisLabelPaneWidth}
@@ -65,7 +65,7 @@ export function LiquidityActiveTooltips({
           containerHeight={CHART_DIMENSIONS.LIQUIDITY_CHART_HEIGHT}
           hoverY={dragStartY}
           hoveredTick={dragStartTick}
-          currentTick={currentTick}
+          currentTick={currentTick.tick}
           currentPrice={currentPrice}
           contentWidth={contentWidth}
           axisLabelPaneWidth={axisLabelPaneWidth}
@@ -80,7 +80,7 @@ export function LiquidityActiveTooltips({
           containerHeight={CHART_DIMENSIONS.LIQUIDITY_CHART_HEIGHT}
           hoverY={dragCurrentY}
           hoveredTick={dragCurrentTick}
-          currentTick={currentTick}
+          currentTick={currentTick.tick}
           currentPrice={currentPrice}
           contentWidth={contentWidth}
           axisLabelPaneWidth={axisLabelPaneWidth}

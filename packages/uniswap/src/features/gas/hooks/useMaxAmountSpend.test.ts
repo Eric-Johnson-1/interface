@@ -6,11 +6,12 @@ import { useMaxAmountSpend } from 'uniswap/src/features/gas/hooks/useMaxAmountSp
 import { TransactionType } from 'uniswap/src/features/transactions/types/transactionDetails'
 import { MAINNET_CURRENCY } from 'uniswap/src/test/fixtures/wallet/currencies'
 
-const mockUseDynamicConfigValue = jest.fn()
+const mockUseDynamicConfigValue = vi.fn()
 
-jest.mock('@universe/gating', () => {
+vi.mock('@universe/gating', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@universe/gating')>()
   return {
-    ...jest.requireActual('@universe/gating'),
+    ...actual,
     useDynamicConfigValue: (params: { config: unknown; key: unknown; defaultValue: unknown }): unknown =>
       mockUseDynamicConfigValue(params),
   }

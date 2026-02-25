@@ -1,17 +1,17 @@
-import { D3RangeAmountInput } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/components/D3RangeAmountInput'
-import { useChartPriceState } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/selectors/priceSelectors'
+import { useCallback, useMemo, useState } from 'react'
+import { Flex } from 'ui/src'
+import { D3RangeAmountInput } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/components/D3RangeAmountInput'
+import { useChartPriceState } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/selectors/priceSelectors'
 import {
   useLiquidityChartStorePriceDifferences,
   useLiquidityChartStoreRenderingContext,
-} from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/selectors/viewSelectors'
-import { TickNavigationParams } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
-import { useLiquidityChartStoreActions } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/useLiquidityChartStore'
-import { RangeSelectionInput } from 'components/Liquidity/Create/RangeAmountInput'
-import { RangeAmountInputPriceMode } from 'components/Liquidity/Create/types'
-import { getBaseAndQuoteCurrencies } from 'components/Liquidity/utils/currency'
-import { useCreateLiquidityContext } from 'pages/CreatePosition/CreateLiquidityContextProvider'
-import { useCallback, useMemo, useState } from 'react'
-import { Flex } from 'ui/src'
+} from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/selectors/viewSelectors'
+import { TickNavigationParams } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
+import { useLiquidityChartStoreActions } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/useLiquidityChartStore'
+import { RangeSelectionInput } from '~/components/Liquidity/Create/RangeAmountInput'
+import { RangeAmountInputPriceMode } from '~/components/Liquidity/Create/types'
+import { getBaseAndQuoteCurrencies } from '~/components/Liquidity/utils/currency'
+import { useCreateLiquidityContext } from '~/pages/CreatePosition/CreateLiquidityContextProvider'
 
 // Convert user input to price based on the input mode
 function usePercentageToPrice() {

@@ -1,3 +1,4 @@
+import { FormattedUniswapXGasFeeInfo } from '@universe/api'
 import { useTranslation } from 'react-i18next'
 import { Flex, Text } from 'ui/src'
 import { UniswapX } from 'ui/src/components/icons/UniswapX'
@@ -7,7 +8,6 @@ import { TransactionDetailsTooltip as Tooltip } from 'uniswap/src/components/Tra
 import { uniswapUrls } from 'uniswap/src/constants/urls'
 import { getChainInfo } from 'uniswap/src/features/chains/chainInfo'
 import { UniverseChainId } from 'uniswap/src/features/chains/types'
-import { FormattedUniswapXGasFeeInfo } from 'uniswap/src/features/gas/types'
 
 export function NetworkCostTooltipClassic({ chainId }: { chainId: UniverseChainId }): JSX.Element {
   const { t } = useTranslation()

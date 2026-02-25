@@ -42,7 +42,9 @@ export function getNotificationQueryOptions(
   return queryOptions({
     queryKey: [ReactQueryCacheKey.Notifications],
     queryFn: async (): Promise<InAppNotification[]> => {
-      if (getIsSessionInitialized && !getIsSessionInitialized()) {
+      const isSessionInitialized = getIsSessionInitialized?.() ?? true
+
+      if (getIsSessionInitialized && !isSessionInitialized) {
         return []
       }
 
@@ -63,11 +65,17 @@ export function getNotificationQueryOptions(
       }
     },
     refetchInterval: getIsSessionInitialized
-      ? (): number => (getIsSessionInitialized() ? pollIntervalMs : 5000)
+      ? (): number => {
+          const isInit = getIsSessionInitialized()
+          // Poll faster (2s) when waiting for session, normal interval once initialized
+          return isInit ? pollIntervalMs : 2000
+        }
       : (): number => pollIntervalMs,
     refetchIntervalInBackground: true,
     refetchOnWindowFocus: false,
-    staleTime: pollIntervalMs - 1000,
+    // Use short staleTime when session check is enabled - allows faster refetches when session becomes ready
+    // Without this, empty results from pre-session fetches would be cached too long
+    staleTime: getIsSessionInitialized ? 1000 : pollIntervalMs - 1000,
     retry: 2,
     retryDelay: (attemptIndex: number): number => Math.min(1000 * 2 ** attemptIndex, 30000),
   })

@@ -1,15 +1,15 @@
 import { WETH9 } from '@uniswap/sdk-core'
-import { useLiquidityUrlState } from 'components/Liquidity/Create/hooks/useLiquidityUrlState'
-import { DEFAULT_FEE_DATA, PositionFlowStep } from 'components/Liquidity/Create/types'
-import { NATIVE_CHAIN_ID } from 'constants/tokens'
-import { useCurrencyWithLoading } from 'hooks/Tokens'
 import { useQueryState, useQueryStates } from 'nuqs'
-import { mocked } from 'test-utils/mocked'
-import { renderHook } from 'test-utils/render'
-import { PositionField } from 'types/position'
 import { nativeOnChain, USDC, USDC_UNICHAIN } from 'uniswap/src/constants/tokens'
 import { UniverseChainId } from 'uniswap/src/features/chains/types'
 import { vi } from 'vitest'
+import { useLiquidityUrlState } from '~/components/Liquidity/Create/hooks/useLiquidityUrlState'
+import { DEFAULT_FEE_DATA, PositionFlowStep } from '~/components/Liquidity/Create/types'
+import { NATIVE_CHAIN_ID } from '~/constants/tokens'
+import { useCurrencyWithLoading } from '~/hooks/Tokens'
+import { mocked } from '~/test-utils/mocked'
+import { renderHook } from '~/test-utils/render'
+import { PositionField } from '~/types/position'
 
 vi.mock('nuqs', async () => {
   const actual = await vi.importActual('nuqs')
@@ -20,8 +20,8 @@ vi.mock('nuqs', async () => {
   }
 })
 
-vi.mock('hooks/Tokens', async () => {
-  const actual = await vi.importActual('hooks/Tokens')
+vi.mock('~/hooks/Tokens', async () => {
+  const actual = await vi.importActual('~/hooks/Tokens')
   return {
     ...actual,
     useCurrencyWithLoading: vi.fn(),

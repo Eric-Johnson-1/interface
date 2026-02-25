@@ -2,7 +2,7 @@ import { Currency, CurrencyAmount } from '@uniswap/sdk-core'
 import { memo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
-import { Flex, Text, TouchableArea } from 'ui/src'
+import { Flex, Text, TextProps, TouchableArea } from 'ui/src'
 import { useEnabledChains } from 'uniswap/src/features/chains/hooks/useEnabledChains'
 import { CurrencyInfo } from 'uniswap/src/features/dataApi/types'
 import { useAppFiatCurrencyInfo } from 'uniswap/src/features/fiatCurrency/hooks'
@@ -26,6 +26,7 @@ interface CurrencyInputPanelValueProps {
   currencyInfo: Maybe<CurrencyInfo>
   currencyAmount: Maybe<CurrencyAmount<Currency>>
   isFiatMode: boolean
+  fiatValueVariant?: TextProps['variant']
 }
 
 export const CurrencyInputPanelValue = memo(function _CurrencyInputPanelValue({
@@ -39,6 +40,7 @@ export const CurrencyInputPanelValue = memo(function _CurrencyInputPanelValue({
   currencyInfo,
   currencyAmount,
   isFiatMode,
+  fiatValueVariant = 'body3',
 }: CurrencyInputPanelValueProps): JSX.Element {
   const { t } = useTranslation()
   const dispatch = useDispatch()
@@ -78,11 +80,16 @@ export const CurrencyInputPanelValue = memo(function _CurrencyInputPanelValue({
     >
       {!isTestnetModeEnabled && (
         <Flex centered row shrink gap="$spacing4" width="max-content">
-          <Text color="$neutral2" $group-item-hover={{ color: '$neutral2Hovered' }} numberOfLines={1} variant="body3">
+          <Text
+            color="$neutral2"
+            $group-item-hover={{ color: '$neutral2Hovered' }}
+            numberOfLines={1}
+            variant={fiatValueVariant}
+          >
             {inputPanelFormattedValue}
           </Text>
           {priceUXEnabled && showPriceDifference && (
-            <Text color="$neutral3" variant="body3">
+            <Text color="$neutral3" variant={fiatValueVariant}>
               ({formatPercent(priceDifferencePercentage)})
             </Text>
           )}

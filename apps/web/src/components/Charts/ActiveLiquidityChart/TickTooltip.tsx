@@ -1,13 +1,13 @@
 import { Currency, Percent } from '@uniswap/sdk-core'
-import { LiquidityBarData } from 'components/Charts/LiquidityChart/types'
-import { ChartEntry } from 'components/Charts/LiquidityRangeInput/types'
-import { DoubleCurrencyLogo } from 'components/Logo/DoubleLogo'
-import tryParseCurrencyAmount from 'lib/utils/tryParseCurrencyAmount'
 import { Flex, FlexProps, Text } from 'ui/src'
 import { iconSizes } from 'ui/src/theme'
 import { useLocalizationContext } from 'uniswap/src/features/language/LocalizationContext'
 import { useUSDCValue } from 'uniswap/src/features/transactions/hooks/useUSDCPrice'
 import { NumberType } from 'utilities/src/format/types'
+import { LiquidityBarData } from '~/components/Charts/LiquidityChart/types'
+import { ChartEntry } from '~/components/Charts/LiquidityRangeInput/types'
+import { DoubleCurrencyLogo } from '~/components/Logo/DoubleLogo'
+import tryParseCurrencyAmount from '~/lib/utils/tryParseCurrencyAmount'
 
 export function TickTooltip({
   hoverY,
@@ -133,7 +133,7 @@ export function TickTooltipContent({
                   : 100,
               )}
             </Text>
-          </Flex>
+          </Flex>{' '}
         </Flex>
       )}
     </Flex>

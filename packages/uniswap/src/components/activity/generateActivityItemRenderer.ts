@@ -7,6 +7,7 @@ import { NFTMintSummaryItem } from 'uniswap/src/components/activity/summaries/NF
 import { NFTTradeSummaryItem } from 'uniswap/src/components/activity/summaries/NFTTradeSummaryItem'
 import { OffRampTransferSummaryItem } from 'uniswap/src/components/activity/summaries/OffRampTransferSummaryItem'
 import { OnRampTransferSummaryItem } from 'uniswap/src/components/activity/summaries/OnRampTransferSummaryItem'
+import { PlanSummaryItem } from 'uniswap/src/components/activity/summaries/PlanSummaryItem'
 import { ReceiveSummaryItem } from 'uniswap/src/components/activity/summaries/ReceiveSummaryItem'
 import { SendSummaryItem } from 'uniswap/src/components/activity/summaries/SendSummaryItem'
 import { SwapSummaryItem } from 'uniswap/src/components/activity/summaries/SwapSummaryItem'
@@ -76,6 +77,9 @@ export function generateActivityItemRenderer({
         break
       case TransactionType.Swap:
         SummaryItem = SwapSummaryItem
+        break
+      case TransactionType.Plan:
+        SummaryItem = PlanSummaryItem
         break
       case TransactionType.WCConfirm:
         SummaryItem = WCSummaryItem

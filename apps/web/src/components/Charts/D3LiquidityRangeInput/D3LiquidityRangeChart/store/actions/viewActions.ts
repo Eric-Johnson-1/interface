@@ -1,14 +1,15 @@
 import {
   CHART_BEHAVIOR,
   CHART_DIMENSIONS,
-} from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
-import type { ChartStoreState } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
-import { boundPanY } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/boundPanY'
-import { calculateDynamicZoomMin } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/chartUtils'
-import { getClosestTick } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/getClosestTick'
-import { calculateRangeViewport } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/rangeViewportUtils'
-import { getCandlestickPriceBounds } from 'components/Charts/PriceChart/utils'
-import { RangeAmountInputPriceMode } from 'components/Liquidity/Create/types'
+} from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
+
+import type { ChartStoreState } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
+import { boundPanY } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/boundPanY'
+import { calculateDynamicZoomMin } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/chartUtils'
+import { calculateRangeViewport } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/rangeViewportUtils'
+import { findClosestTick } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/tickUtils'
+import { getCandlestickPriceBounds } from '~/components/Charts/PriceChart/utils'
+import { RangeAmountInputPriceMode } from '~/components/Liquidity/Create/types'
 
 interface ViewActionCallbacks {
   onInputModeChange: (inputMode: RangeAmountInputPriceMode) => void
@@ -80,8 +81,8 @@ export const createViewActions = ({
     const { liquidityData } = renderingContext
 
     // Find the ticks that correspond to minPrice and maxPrice
-    const { index: minTickIndex } = getClosestTick(liquidityData, minPrice)
-    const { index: maxTickIndex } = getClosestTick(liquidityData, maxPrice)
+    const { index: minTickIndex } = findClosestTick(liquidityData, minPrice)
+    const { index: maxTickIndex } = findClosestTick(liquidityData, maxPrice)
 
     const { targetZoom, targetPanY } = calculateRangeViewport({
       minTickIndex,
@@ -157,8 +158,8 @@ export const createViewActions = ({
     const calculatedDefaultMaxPrice = minVisiblePrice + visibleRange * 0.8
 
     // Find ticks for calculated default prices
-    const { index: defaultMinTickIndex } = getClosestTick(liquidityData, calculatedDefaultMinPrice)
-    const { index: defaultMaxTickIndex } = getClosestTick(liquidityData, calculatedDefaultMaxPrice)
+    const { index: defaultMinTickIndex } = findClosestTick(liquidityData, calculatedDefaultMinPrice)
+    const { index: defaultMaxTickIndex } = findClosestTick(liquidityData, calculatedDefaultMaxPrice)
     const defaultMinPrice = liquidityData[defaultMinTickIndex].price0
     const defaultMaxPrice = liquidityData[defaultMaxTickIndex].price0
 
@@ -175,8 +176,8 @@ export const createViewActions = ({
     const maxPrice = providedMaxPrice ?? defaultMaxPrice
 
     // Find ticks for the actual position
-    const { index: minTickIndex } = getClosestTick(liquidityData, minPrice)
-    const { index: maxTickIndex } = getClosestTick(liquidityData, maxPrice)
+    const { tick: minTickEntry, index: minTickIndex } = findClosestTick(liquidityData, minPrice)
+    const { tick: maxTickEntry, index: maxTickIndex } = findClosestTick(liquidityData, maxPrice)
 
     const resetDimensions = { width: 0, height: CHART_DIMENSIONS.LIQUIDITY_CHART_HEIGHT }
 
@@ -195,6 +196,8 @@ export const createViewActions = ({
         panY: centerPanY,
         minPrice: minPriceValue,
         maxPrice: maxPriceValue,
+        minTick: minTickEntry.tick,
+        maxTick: maxTickEntry.tick,
       })
 
       return
@@ -213,14 +216,16 @@ export const createViewActions = ({
         panY: centerPanY,
         minPrice,
         maxPrice,
+        minTick: minTickEntry.tick,
+        maxTick: maxTickEntry.tick,
       })
     }
 
     // Wait until animation is complete before calling handlePriceChange
     setTimeout(
       () => {
-        actions.handlePriceChange('min', minPrice)
-        actions.handlePriceChange('max', maxPrice)
+        actions.handlePriceChange({ changeType: 'min', price: minPrice, tick: minTickEntry.tick })
+        actions.handlePriceChange({ changeType: 'max', price: maxPrice, tick: maxTickEntry.tick })
       },
       animate ? CHART_BEHAVIOR.ANIMATION_DURATION : 0,
     )

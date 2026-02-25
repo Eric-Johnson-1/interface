@@ -1,5 +1,5 @@
 import { FeatureFlags, useFeatureFlag } from '@universe/gating'
-import { AZTEC_ADDRESS } from 'uniswap/src/features/transactions/swap/hooks/useSwapWarnings/getAztecUnavailableWarning'
+import { AZTEC_ADDRESS } from 'uniswap/src/constants/addresses'
 
 export const shouldShowAztecWarning = ({
   address,
@@ -8,7 +8,7 @@ export const shouldShowAztecWarning = ({
   address: Address
   isAztecDisabled: boolean
 }): boolean => {
-  const isAztec = address.toLowerCase() === AZTEC_ADDRESS
+  const isAztec = address.toLowerCase() === AZTEC_ADDRESS.toLowerCase()
   return isAztec && isAztecDisabled
 }
 

@@ -1,16 +1,16 @@
 import { CellContext, flexRender, RowData } from '@tanstack/react-table'
-import { ROW_HEIGHT_DESKTOP, ROW_HEIGHT_MOBILE_WEB } from 'components/Table/constants'
-import { ErrorModal } from 'components/Table/ErrorBox'
-import { CellContainer, DataRow, NoDataFoundTableRow } from 'components/Table/styled'
-import { TableRow } from 'components/Table/TableRow'
-import { useTableSize } from 'components/Table/TableSizeProvider'
-import { TableBodyProps } from 'components/Table/types'
-import { getColumnSizingStyles } from 'components/Table/utils'
 import { forwardRef, useMemo } from 'react'
 import { Trans } from 'react-i18next'
-import { ThemedText } from 'theme/components'
 import { Flex } from 'ui/src'
 import { breakpoints } from 'ui/src/theme'
+import { ROW_HEIGHT_DESKTOP, ROW_HEIGHT_MOBILE_WEB } from '~/components/Table/constants'
+import { ErrorModal } from '~/components/Table/ErrorBox'
+import { CellContainer, DataRow, NoDataFoundTableRow } from '~/components/Table/styled'
+import { TableRow } from '~/components/Table/TableRow'
+import { useTableSize } from '~/components/Table/TableSizeProvider'
+import { TableBodyProps } from '~/components/Table/types'
+import { getColumnSizingStyles } from '~/components/Table/utils'
+import { ThemedText } from '~/theme/components'
 
 function TableBodyInner<T extends RowData>(
   {
@@ -22,6 +22,7 @@ function TableBodyInner<T extends RowData>(
     loadingRowsCount = 20,
     rowHeight: propRowHeight,
     compactRowHeight: propCompactRowHeight,
+    hasPinnedColumns = false,
   }: TableBodyProps<T>,
   ref: React.Ref<HTMLDivElement>,
 ) {
@@ -38,7 +39,7 @@ function TableBodyInner<T extends RowData>(
   if (loading || error) {
     return (
       <>
-        <Flex>
+        <Flex gap={!hasPinnedColumns && v2 ? '$spacing2' : undefined}>
           {Array.from({ length: loadingRowsCount }, (_, rowIndex) => (
             <DataRow key={`skeleton-row-${rowIndex}`} height={skeletonRowHeight} v2={v2}>
               {table.getAllColumns().map((column, columnIndex) => (
@@ -73,7 +74,7 @@ function TableBodyInner<T extends RowData>(
   }
 
   return (
-    <Flex ref={ref} position="relative">
+    <Flex ref={ref} position="relative" gap={!hasPinnedColumns ? '$spacing2' : undefined}>
       {rows.map((row) => (
         <TableRow<T>
           key={row.id}

@@ -3,7 +3,7 @@ import { ContractInteraction } from 'ui/src/components/icons/ContractInteraction
 import { iconSizes } from 'ui/src/theme'
 import { SwapTypeTransactionInfo } from 'uniswap/src/components/activity/details/types'
 import { DappLogoWithWCBadge, LogoWithTxStatus } from 'uniswap/src/components/CurrencyLogo/LogoWithTxStatus'
-import { BridgeIcon, SplitLogo } from 'uniswap/src/components/CurrencyLogo/SplitLogo'
+import { CrossChainIcon, SplitLogo } from 'uniswap/src/components/CurrencyLogo/SplitLogo'
 import { AssetType } from 'uniswap/src/entities/assets'
 import { CurrencyInfo } from 'uniswap/src/features/dataApi/types'
 import {
@@ -13,6 +13,9 @@ import {
 } from 'uniswap/src/features/tokens/useCurrencyInfo'
 import {
   ApproveTransactionInfo,
+  AuctionBidTransactionInfo,
+  AuctionClaimedTransactionInfo,
+  AuctionExitedTransactionInfo,
   BridgeTransactionInfo,
   ClaimUniTransactionInfo,
   LiquidityTransactionBaseInfos,
@@ -25,10 +28,13 @@ import {
   OnRampPurchaseInfo,
   OnRampTransferInfo,
   Permit2ApproveTransactionInfo,
+  PlanTransactionInfo,
   ReceiveTokenTransactionInfo,
   RemoveDelegationTransactionInfo,
   SendCallsTransactionInfo,
   SendTokenTransactionInfo,
+  ToucanBidTransactionInfo,
+  ToucanWithdrawBidAndClaimTokensTransactionInfo,
   TransactionDetails,
   TransactionType,
   UnknownTransactionInfo,
@@ -89,7 +95,8 @@ export function TransactionDetailsHeaderLogo({ transactionDetails }: HeaderLogoP
     case TransactionType.Swap:
       return <SwapHeaderLogo transactionDetails={transactionDetails} typeInfo={typeInfo} />
     case TransactionType.Bridge:
-      return <BridgeHeaderLogo transactionDetails={transactionDetails} typeInfo={typeInfo} />
+    case TransactionType.Plan:
+      return <CrossChainHeaderLogo transactionDetails={transactionDetails} typeInfo={typeInfo} />
     case TransactionType.WCConfirm:
       return <WCConfirmHeaderLogo transactionDetails={transactionDetails} typeInfo={typeInfo} />
     case TransactionType.Wrap:
@@ -125,10 +132,10 @@ interface SpecificHeaderLogoProps<T> extends HeaderLogoProps {
   typeInfo: T
 }
 
-function BridgeHeaderLogo({
+function CrossChainHeaderLogo({
   transactionDetails,
   typeInfo,
-}: SpecificHeaderLogoProps<BridgeTransactionInfo>): JSX.Element {
+}: SpecificHeaderLogoProps<BridgeTransactionInfo | PlanTransactionInfo>): JSX.Element {
   const inputCurrency = useCurrencyInfo(typeInfo.inputCurrencyId)
   const outputCurrency = useCurrencyInfo(typeInfo.outputCurrencyId)
 
@@ -138,7 +145,7 @@ function BridgeHeaderLogo({
       outputCurrencyInfo={outputCurrency}
       size={TXN_DETAILS_ICON_SIZE}
       chainId={transactionDetails.chainId}
-      customIcon={BridgeIcon}
+      customIcon={<CrossChainIcon status={transactionDetails.status} />}
     />
   )
 }
@@ -280,6 +287,11 @@ function UnknownHeaderLogo({
   | ClaimUniTransactionInfo
   | MigrateV2LiquidityToV3TransactionInfo
   | LpIncentivesClaimTransactionInfo
+  | ToucanBidTransactionInfo
+  | ToucanWithdrawBidAndClaimTokensTransactionInfo
+  | AuctionBidTransactionInfo
+  | AuctionClaimedTransactionInfo
+  | AuctionExitedTransactionInfo
 >): JSX.Element {
   const colors = useSporeColors()
   // Check if dappInfo exists since it may not exist on all transaction types

@@ -1,7 +1,7 @@
 import { TickMath } from '@uniswap/v3-sdk'
-import { getAmount0, getAmount1 } from 'components/Charts/LiquidityChart/utils/getAmounts'
 import JSBI from 'jsbi'
 import { describe, expect, it } from 'vitest'
+import { getAmount0, getAmount1 } from '~/components/Charts/LiquidityChart/utils/getAmounts'
 
 describe('getAmount0', () => {
   it('should return full amount when currentTick is below tickLower', () => {

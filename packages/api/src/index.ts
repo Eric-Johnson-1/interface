@@ -12,6 +12,7 @@
 export { createFetchClient } from '@universe/api/src/clients/base/createFetchClient'
 export {
   FetchError,
+  is401Error,
   is404Error,
   isRateLimitFetchError,
 } from '@universe/api/src/clients/base/errors'
@@ -112,19 +113,42 @@ export {
 } from '@universe/api/src/clients/trading/tradeTypes'
 export {
   FeeType,
+  type FormattedUniswapXGasFeeInfo,
   type GasEstimate,
   type GasEstimateEip1559,
   type GasEstimateLegacy,
+  type GasFeeResponse,
+  type GasFeeResult,
+  type GasFeeResultWithoutState,
   type GasStrategy,
+  type TransactionEip1559FeeParams,
+  type TransactionLegacyFeeParams,
 } from '@universe/api/src/clients/trading/types'
 
 // Liquidity Service API
 export {
   createLiquidityServiceClient,
-  LIQUIDITY_PATHS,
   type LiquidityServiceClient,
-  type LiquidityServiceClientContext,
 } from '@universe/api/src/clients/liquidity/createLiquidityServiceClient'
+export {
+  createAuctionMutationClient,
+  type AuctionMutationClient,
+} from '@universe/api/src/clients/liquidity/createAuctionMutationClient'
+
+// Auction Service API
+export {
+  createAuctionServiceClient,
+  type AuctionServiceClient,
+} from '@universe/api/src/clients/auctions/createAuctionServiceClient'
+
+// Uniswap API
+export {
+  createUniswapApiClient,
+  type ScreenRequest,
+  type ScreenResponse,
+  type UniswapApiClient,
+  type UniswapApiClientContext,
+} from '@universe/api/src/clients/uniswap/createUniswapApiClient'
 
 // Unitags API
 export {
@@ -152,6 +176,21 @@ export {
 } from '@universe/api/src/clients/unitags/types'
 export { createUnitagsApiClient } from '@universe/api/src/clients/unitags/createUnitagsApiClient'
 
+// Data API Service (ConnectRPC - listTopTokens, listTopPools, etc.)
+export {
+  createDataApiServiceClient,
+  type DataApiServiceClient,
+  type DataApiServiceClientContext,
+} from '@universe/api/src/clients/dataApi/createDataApiServiceClient'
+export {
+  TopPoolsOrderBy,
+  TopTokensOrderBy,
+  type ListTopPoolsResponse,
+  type ListTopTokensResponse,
+} from '@uniswap/client-data-api/dist/data/v1/api_pb'
+export { ProtocolVersion } from '@uniswap/client-data-api/dist/data/v1/poolTypes_pb'
+export { type Pool as DataApiPool, type Token as DataApiToken } from '@uniswap/client-data-api/dist/data/v1/types_pb'
+
 // Data Service API
 export {
   createDataServiceApiClient,
@@ -173,6 +212,45 @@ export type {
   NotificationsApiClient,
   NotificationsClientContext,
 } from '@universe/api/src/clients/notifications/types'
+
+// FOR (Fiat On-Ramp) API
+export {
+  createForApiClient,
+  type ForApiClient,
+} from '@universe/api/src/clients/for/createForApiClient'
+export { transformPaymentMethods } from '@universe/api/src/clients/for/utils'
+export type {
+  FORCountry,
+  FORLogo,
+  FORQuote,
+  FORQuoteResponse,
+  FORServiceProvider,
+  FORSupportedFiatCurrency,
+  FORSupportedToken,
+  FORTransaction,
+} from '@universe/api/src/clients/for/types'
+// Re-export FOR protobuf types for consumer packages
+export {
+  RampDirection,
+  TransactionStatus as FORTransactionStatus,
+  GetCountryResponse,
+  OffRampTransferDetailsRequest,
+  OffRampTransferDetailsResponse,
+  OffRampWidgetUrlRequest,
+  QuoteRequest,
+  SupportedCountriesRequest,
+  SupportedCountriesResponse,
+  SupportedFiatCurrenciesRequest,
+  SupportedFiatCurrenciesResponse,
+  SupportedTokensRequest,
+  SupportedTokensResponse,
+  TransactionRequest,
+  TransactionResponse,
+  TransferServiceProvidersResponse,
+  TransferWidgetUrlRequest,
+  WidgetUrlRequest,
+  WidgetUrlResponse,
+} from '@uniswap/client-for/dist/for/v1/api_pb'
 
 // ConnectRPC API
 export {
@@ -207,6 +285,10 @@ export {
 // Session API
 export { ApiInit, SESSION_INIT_QUERY_KEY } from '@universe/api/src/components/ApiInit'
 export { provideSessionService } from '@universe/api/src/provideSessionService'
+export { useIsSessionInitialized } from '@universe/api/src/hooks/useIsSessionInitialized'
+
+// Session Transport (pure factory, no platform detection)
+export { createSessionTransport, type CreateSessionTransportOptions } from '@universe/api/src/session'
 
 export type {
   UseQueryApiHelperHookArgs,
@@ -223,6 +305,6 @@ export {
 
 export { getTransport } from '@universe/api/src/transport'
 
-export { getEntryGatewayUrl } from '@universe/api/src/getEntryGatewayUrl'
+export { getEntryGatewayUrl, getMigratedForApiUrl } from '@universe/api/src/getEntryGatewayUrl'
 
 export { provideUniswapIdentifierService } from '@universe/api/src/provideUniswapIdentifierService'

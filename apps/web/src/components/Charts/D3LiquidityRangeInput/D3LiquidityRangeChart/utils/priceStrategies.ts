@@ -1,6 +1,6 @@
-import { DefaultPriceStrategy } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
-import { getClosestTick } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/getClosestTick'
-import { ChartEntry } from 'components/Charts/LiquidityRangeInput/types'
+import { DefaultPriceStrategy } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
+import { findClosestTick } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/tickUtils'
+import { ChartEntry } from '~/components/Charts/LiquidityRangeInput/types'
 
 // Price tolerance for detecting strategy matches (1%)
 const PRICE_TOLERANCE = 0.01
@@ -19,7 +19,7 @@ export function calculateStrategyPrices({
   defaultMinPrice?: number
   defaultMaxPrice?: number
 }): { minPrice: number; maxPrice: number } {
-  const { index } = getClosestTick(liquidityData, currentPrice)
+  const { index } = findClosestTick(liquidityData, currentPrice)
   const nextTick = liquidityData[index + 1]
   const prevTick = liquidityData[index - 1]
 

@@ -1,10 +1,9 @@
 // biome-ignore lint/style/noRestrictedImports: Trading API fixtures need direct Playwright imports
-import { test as base } from '@playwright/test'
-import { Mocks } from 'playwright/mocks/mocks'
-import { type Page } from 'playwright/test'
+import { test as base, type Page } from '@playwright/test'
 import { uniswapUrls } from 'uniswap/src/constants/urls'
+import { Mocks } from '~/playwright/mocks/mocks'
 
-export const DEFAULT_TEST_GAS_LIMIT = '20000000'
+const DEFAULT_TEST_GAS_LIMIT = '20000000'
 
 const shouldIgnorePageError = (error: Error): { ignored: boolean } => {
   if (

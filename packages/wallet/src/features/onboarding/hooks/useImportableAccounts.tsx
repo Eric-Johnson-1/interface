@@ -166,7 +166,7 @@ export function useAddressesBalanceAndNames(addresses?: Address[]): {
       // This function is loading if we don't have addresses or are waiting on data. The first two are data, the
       // last two cases occur when we are waiting for addresses
       isLoading: balanceAndUnitagsLoading || ensLoading || isLoadingAddresses || addressInfoMap === undefined,
-      error: fetchingError && !balanceAndUnitags?.length,
+      error: fetchingError && Object.keys(balanceAndUnitags ?? {}).length === 0,
       refetch,
     }),
     [

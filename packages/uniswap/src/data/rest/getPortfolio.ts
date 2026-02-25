@@ -1,13 +1,13 @@
-import { PartialMessage } from '@bufbuild/protobuf'
+import { type PartialMessage } from '@bufbuild/protobuf'
 import { createPromiseClient } from '@connectrpc/connect'
-import { Query, queryOptions, UseQueryResult, useQuery } from '@tanstack/react-query'
+import { type Query, queryOptions, type UseQueryResult, useQuery } from '@tanstack/react-query'
 import { DataApiService } from '@uniswap/client-data-api/dist/data/v1/api_connect'
-import { GetPortfolioRequest, GetPortfolioResponse } from '@uniswap/client-data-api/dist/data/v1/api_pb'
-import { Balance } from '@uniswap/client-data-api/dist/data/v1/types_pb'
-import { SharedQueryClient, transformInput, WithoutWalletAccount } from '@universe/api'
+import { type GetPortfolioRequest, type GetPortfolioResponse } from '@uniswap/client-data-api/dist/data/v1/api_pb'
+import { type Balance } from '@uniswap/client-data-api/dist/data/v1/types_pb'
+import { SharedQueryClient, transformInput, type WithoutWalletAccount } from '@universe/api'
 import { uniswapGetTransport } from 'uniswap/src/data/rest/base'
 import {
-  AccountAddressesByPlatform,
+  type AccountAddressesByPlatform,
   buildAccountAddressesByPlatform,
   isAccountAddressesByPlatform,
 } from 'uniswap/src/data/rest/buildAccountAddressesByPlatform'
@@ -19,16 +19,16 @@ import {
 } from 'uniswap/src/data/rest/portfolioBalanceOverrides'
 import { useEnabledChains } from 'uniswap/src/features/chains/hooks/useEnabledChains'
 import { useRestPortfolioValueModifier } from 'uniswap/src/features/dataApi/balances/balancesRest'
-import { Platform } from 'uniswap/src/features/platforms/types/Platform'
+import { type Platform } from 'uniswap/src/features/platforms/types/Platform'
 import { fetchAndMergeOnchainBalances } from 'uniswap/src/features/portfolio/portfolioUpdates/rest/refetchRestQueriesViaOnchainOverrideVariantSaga'
 import { removeExpiredBalanceOverrides } from 'uniswap/src/features/portfolio/slice/slice'
-import { CurrencyId } from 'uniswap/src/types/currency'
+import { type CurrencyId } from 'uniswap/src/types/currency'
 import { areAddressesEqual } from 'uniswap/src/utils/addresses'
 import { currencyIdToAddress, currencyIdToChain, isNativeCurrencyAddress } from 'uniswap/src/utils/currencyId'
 import { createLogger } from 'utilities/src/logger/logger'
 import { useEvent } from 'utilities/src/react/hooks'
 import { ReactQueryCacheKey } from 'utilities/src/reactQuery/cache'
-import { QueryOptionsResult } from 'utilities/src/reactQuery/queryOptions'
+import { type QueryOptionsResult } from 'utilities/src/reactQuery/queryOptions'
 
 export type GetPortfolioInput<TSelectData = GetPortfolioResponse> = {
   input?: WithoutWalletAccount<PartialMessage<GetPortfolioRequest>> & {
@@ -89,11 +89,17 @@ export const getPortfolioQuery = <TSelectData = GetPortfolioResponse>({
     modifier: _modifier,
     // The information in `walletAccount` is already included and normalized in `accountAddressesByPlatform`, so we exclude it here.
     walletAccount: _walletAccount,
-    ...inputWithoutModifierAndWalletAccount
+    ...queryCacheInputs
   } = transformedInput ?? {}
 
+  const queryCacheInputsSorted = { ...queryCacheInputs }
+  if ('chainIds' in queryCacheInputs && queryCacheInputs.chainIds) {
+    // This prevents cache misses when chainIds array has same values but different order
+    queryCacheInputsSorted.chainIds = [...queryCacheInputs.chainIds].sort()
+  }
+
   return queryOptions({
-    queryKey: [ReactQueryCacheKey.GetPortfolio, accountAddressesByPlatform, inputWithoutModifierAndWalletAccount],
+    queryKey: [ReactQueryCacheKey.GetPortfolio, accountAddressesByPlatform, queryCacheInputsSorted],
     queryFn: async () => {
       const log = createLogger('getPortfolio.ts', 'queryFn', '[REST-ITBU]')
 

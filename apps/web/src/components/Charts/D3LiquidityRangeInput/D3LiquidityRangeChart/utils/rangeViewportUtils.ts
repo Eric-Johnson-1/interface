@@ -1,8 +1,8 @@
 import {
   CHART_BEHAVIOR,
   CHART_DIMENSIONS,
-} from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
-import { ChartEntry } from 'components/Charts/LiquidityRangeInput/types'
+} from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
+import { ChartEntry } from '~/components/Charts/LiquidityRangeInput/types'
 
 /**
  * Calculates zoom and pan parameters to fit a price range in the viewport

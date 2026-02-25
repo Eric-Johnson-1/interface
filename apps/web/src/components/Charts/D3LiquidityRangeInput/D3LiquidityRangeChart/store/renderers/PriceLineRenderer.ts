@@ -1,9 +1,9 @@
+import * as d3 from 'd3'
 import type {
   ChartState,
   Renderer,
   RenderingContext,
-} from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
-import * as d3 from 'd3'
+} from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
 
 export function createPriceLineRenderer({
   g,

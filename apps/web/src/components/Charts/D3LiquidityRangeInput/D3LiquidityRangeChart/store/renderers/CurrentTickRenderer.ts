@@ -1,11 +1,11 @@
-import { CHART_DIMENSIONS } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
+import * as d3 from 'd3'
+import { CHART_DIMENSIONS } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
 import type {
   ChartState,
   Renderer,
   RenderingContext,
-} from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
-import { getColorForPrice } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/colorUtils'
-import * as d3 from 'd3'
+} from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
+import { getColorForPrice } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/colorUtils'
 
 const CURRENT_PRICE_CLASSES = {
   LINE: 'current-price-line',

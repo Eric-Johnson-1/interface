@@ -1,4 +1,4 @@
-import { ChartEntry } from 'components/Charts/LiquidityRangeInput/types'
+import { ChartEntry } from '~/components/Charts/LiquidityRangeInput/types'
 
 export type TickAlignment = 'center' | 'top' | 'bottom'
 

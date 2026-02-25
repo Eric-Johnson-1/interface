@@ -55,6 +55,8 @@ export type CurrencyInfo = {
   isBridged?: Maybe<boolean>
   // Information about how to withdraw a bridged asset to its native chain
   bridgedWithdrawalInfo?: Maybe<GraphQLApi.BridgedWithdrawalInfo>
+  /** Used for deduplication of tokens across chains. */
+  projectId?: Maybe<string>
 }
 
 // Portfolio balance as exposed to the app

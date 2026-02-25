@@ -6,6 +6,7 @@ import {
 import { TradingApi } from '@universe/api'
 
 import { parseRestApproveTransaction } from 'uniswap/src/features/activity/parse/parseApproveTransaction'
+import { parseRestAuctionTransaction } from 'uniswap/src/features/activity/parse/parseAuctionTransaction'
 import { parseRestBridgeTransaction } from 'uniswap/src/features/activity/parse/parseBridgingTransaction'
 import {
   buildExecuteTransactionDetails,
@@ -20,6 +21,7 @@ import {
   parseRestWrapTransaction,
 } from 'uniswap/src/features/activity/parse/parseTradeTransaction'
 import { parseRestUnknownTransaction } from 'uniswap/src/features/activity/parse/parseUnknownTransaction'
+import { ValueType } from 'uniswap/src/features/tokens/getCurrencyAmount'
 import {
   TransactionDetails,
   TransactionOriginType,
@@ -96,6 +98,13 @@ export default function extractRestOnChainTransactionDetails(transaction: OnChai
     case OnChainTransactionLabel.DECREASE_LIQUIDITY:
       typeInfo = parseRestLiquidityTransaction(transaction)
       break
+    case OnChainTransactionLabel.AUCTION_SUBMIT_BID:
+    case OnChainTransactionLabel.AUCTION_CLAIM_TOKENS:
+    case OnChainTransactionLabel.AUCTION_EXIT_BID:
+    case OnChainTransactionLabel.AUCTION_EXIT_PARTIALLY_FILLED_BID:
+    case OnChainTransactionLabel.AUCTION_CLAIM_TOKENS_BATCHED:
+      typeInfo = parseRestAuctionTransaction(transaction)
+      break
   }
 
   if (!typeInfo) {
@@ -108,6 +117,7 @@ export default function extractRestOnChainTransactionDetails(transaction: OnChai
         tokenSymbol: fee.symbol,
         tokenAddress: fee.address,
         chainId,
+        valueType: ValueType.Exact,
       }
     : undefined
 

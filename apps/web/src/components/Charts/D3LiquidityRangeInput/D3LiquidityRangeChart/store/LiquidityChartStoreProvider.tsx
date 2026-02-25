@@ -1,9 +1,9 @@
 import { GraphQLApi } from '@universe/api'
-import { createLiquidityChartStore } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/createLiquidityChartStore'
-import { LiquidityChartStoreContext } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/LiquidityChartStoreContext'
-import { useLiquidityChartStoreActions } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/useLiquidityChartStore'
-import { RangeAmountInputPriceMode } from 'components/Liquidity/Create/types'
 import { PropsWithChildren, ReactNode, useContext, useEffect, useState } from 'react'
+import { createLiquidityChartStore } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/createLiquidityChartStore'
+import { LiquidityChartStoreContext } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/LiquidityChartStoreContext'
+import { useLiquidityChartStoreActions } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/useLiquidityChartStore'
+import { RangeAmountInputPriceMode } from '~/components/Liquidity/Create/types'
 
 interface LiquidityChartStoreProviderProps {
   inputMode?: RangeAmountInputPriceMode
@@ -13,8 +13,8 @@ interface LiquidityChartStoreProviderProps {
   isFullRange?: boolean
   selectedHistoryDuration: GraphQLApi.HistoryDuration
   onInputModeChange: (inputMode: RangeAmountInputPriceMode) => void
-  onMinPriceChange: (price?: number) => void
-  onMaxPriceChange: (price?: number) => void
+  onMinPriceChange: (price?: number, tick?: number) => void
+  onMaxPriceChange: (price?: number, tick?: number) => void
   onTimePeriodChange?: (timePeriod: GraphQLApi.HistoryDuration) => void
   setIsFullRange: (isFullRange: boolean) => void
 }

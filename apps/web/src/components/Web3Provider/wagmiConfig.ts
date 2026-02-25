@@ -1,8 +1,4 @@
 import { getWagmiConnectorV2 } from '@binance/w3w-wagmi-connector-v2'
-import { PLAYWRIGHT_CONNECT_ADDRESS } from 'components/Web3Provider/constants'
-import { createRejectableMockConnector } from 'components/Web3Provider/rejectableConnector'
-import { WC_PARAMS } from 'components/Web3Provider/walletConnect'
-import { embeddedWallet } from 'connection/EmbeddedWalletConnector'
 import { porto } from 'porto/wagmi'
 import { UNISWAP_LOGO } from 'ui/src/assets'
 import { UNISWAP_WEB_URL } from 'uniswap/src/constants/urls'
@@ -18,6 +14,10 @@ import { createClient } from 'viem'
 import type { Config } from 'wagmi'
 import { createConfig, fallback, http } from 'wagmi'
 import { coinbaseWallet, injected, safe, walletConnect } from 'wagmi/connectors'
+import { PLAYWRIGHT_CONNECT_ADDRESS } from '~/components/Web3Provider/constants'
+import { createRejectableMockConnector } from '~/components/Web3Provider/rejectableConnector'
+import { WC_PARAMS } from '~/components/Web3Provider/walletConnect'
+import { embeddedWallet } from '~/connection/EmbeddedWalletConnector'
 
 // Get the appropriate Binance connector based on the environment
 const getBinanceConnector = () => {

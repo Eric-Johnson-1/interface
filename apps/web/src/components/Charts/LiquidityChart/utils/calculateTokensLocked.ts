@@ -1,14 +1,15 @@
 import { Currency, CurrencyAmount } from '@uniswap/sdk-core'
 import { TickMath } from '@uniswap/v3-sdk'
-import { getAmount0, getAmount1 } from 'components/Charts/LiquidityChart/utils/getAmounts'
 import JSBI from 'jsbi'
 import { logger } from 'utilities/src/logger/logger'
+import { getAmount0, getAmount1 } from '~/components/Charts/LiquidityChart/utils/getAmounts'
 
 export function calculateTokensLocked({
   token0,
   token1,
   tickSpacing,
   currentTick,
+  nextTick,
   amount,
   tick,
 }: {
@@ -16,12 +17,13 @@ export function calculateTokensLocked({
   token1: Currency
   tickSpacing: number
   currentTick: number
+  nextTick?: number
   amount: JSBI
   tick: { tick: number; liquidityNet: JSBI }
 }): { amount0Locked: number; amount1Locked: number } {
   try {
     const tickLower = tick.tick
-    const tickUpper = Math.min(TickMath.MAX_TICK, tick.tick + tickSpacing)
+    const tickUpper = Math.min(TickMath.MAX_TICK, nextTick ?? TickMath.MAX_TICK)
     const currSqrtPriceX96 = TickMath.getSqrtRatioAtTick(currentTick)
 
     const amount0BigInt = getAmount0({

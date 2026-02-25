@@ -1,22 +1,7 @@
 import { ProtocolVersion } from '@uniswap/client-data-api/dist/data/v1/poolTypes_pb'
 import { Currency, CurrencyAmount } from '@uniswap/sdk-core'
-import {
-  getLiquidityRangeChartProps,
-  WrappedLiquidityPositionRangeChart,
-} from 'components/Charts/LiquidityPositionRangeChart/LiquidityPositionRangeChart'
-import { ErrorCallout } from 'components/ErrorCallout'
-import { BaseQuoteFiatAmount } from 'components/Liquidity/BaseQuoteFiatAmount'
-import { PoolOutOfSyncError } from 'components/Liquidity/Create/PoolOutOfSyncError'
-import { LiquidityPositionInfoBadges } from 'components/Liquidity/LiquidityPositionInfoBadges'
-import { DoubleCurrencyLogo } from 'components/Logo/DoubleLogo'
-import { DetailLineItem } from 'components/swap/DetailLineItem'
-import { MouseoverTooltip } from 'components/Tooltip'
-import { useCurrencyInfo } from 'hooks/Tokens'
-import { useAccount } from 'hooks/useAccount'
-import { useCreateLiquidityContext } from 'pages/CreatePosition/CreateLiquidityContextProvider'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { PositionField } from 'types/position'
 import { Button, Flex, Separator, Text } from 'ui/src'
 import { InfoCircleFilled } from 'ui/src/components/icons/InfoCircleFilled'
 import { Passkey } from 'ui/src/components/icons/Passkey'
@@ -33,6 +18,21 @@ import { useUSDCValue } from 'uniswap/src/features/transactions/hooks/useUSDCPri
 import { TransactionStep } from 'uniswap/src/features/transactions/steps/types'
 import { TestID } from 'uniswap/src/test/fixtures/testIDs'
 import { NumberType } from 'utilities/src/format/types'
+import {
+  getLiquidityRangeChartProps,
+  WrappedLiquidityPositionRangeChart,
+} from '~/components/Charts/LiquidityPositionRangeChart/LiquidityPositionRangeChart'
+import { ErrorCallout } from '~/components/ErrorCallout'
+import { BaseQuoteFiatAmount } from '~/components/Liquidity/BaseQuoteFiatAmount'
+import { PoolOutOfSyncError } from '~/components/Liquidity/Create/PoolOutOfSyncError'
+import { LiquidityPositionInfoBadges } from '~/components/Liquidity/LiquidityPositionInfoBadges'
+import { DoubleCurrencyLogo } from '~/components/Logo/DoubleLogo'
+import { DetailLineItem } from '~/components/swap/DetailLineItem'
+import { MouseoverTooltip } from '~/components/Tooltip'
+import { useCurrencyInfo } from '~/hooks/Tokens'
+import { useAccount } from '~/hooks/useAccount'
+import { useCreateLiquidityContext } from '~/pages/CreatePosition/CreateLiquidityContextProvider'
+import { PositionField } from '~/types/position'
 
 export interface ReviewModalProps {
   modalName: ModalNameType

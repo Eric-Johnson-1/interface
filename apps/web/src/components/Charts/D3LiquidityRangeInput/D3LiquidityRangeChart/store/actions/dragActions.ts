@@ -1,12 +1,12 @@
-import { CHART_DIMENSIONS } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
-import type { ChartStoreState } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
+import * as d3 from 'd3'
+import { CHART_DIMENSIONS } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
+import type { ChartStoreState } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
 import {
   calculateNewRange,
   calculateTickIndices,
   findClosestTick,
   getDataBounds,
-} from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/tickUtils'
-import * as d3 from 'd3'
+} from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/tickUtils'
 
 export function createDragActions(get: () => ChartStoreState) {
   return {
@@ -52,7 +52,7 @@ export function createDragActions(get: () => ChartStoreState) {
       let initialMaxPrice: number | undefined
 
       // Helper function to calculate final prices from drag
-      const calculateFinalPrices = (draggedY: number) => {
+      const calculateFinalPricesAndTicks = (draggedY: number) => {
         const otherPrice = lineType === 'min' ? initialMaxPrice : initialMinPrice
 
         if (!otherPrice) {
@@ -98,7 +98,16 @@ export function createDragActions(get: () => ChartStoreState) {
           finalMaxPrice = lineType === 'min' ? otherPrice : constrainedPrice
         }
 
-        return { finalMinPrice, finalMaxPrice, constrainedY: draggedY }
+        const { tick: minTickEntry } = findClosestTick(renderingContext.liquidityData, finalMinPrice)
+        const { tick: maxTickEntry } = findClosestTick(renderingContext.liquidityData, finalMaxPrice)
+
+        return {
+          finalMinPrice,
+          finalMaxPrice,
+          minTick: minTickEntry.tick,
+          maxTick: maxTickEntry.tick,
+          constrainedY: draggedY,
+        }
       }
 
       return d3
@@ -110,7 +119,8 @@ export function createDragActions(get: () => ChartStoreState) {
         })
         .on('drag', (event) => {
           const clampedY = clampYToChartBounds(event.y)
-          const { finalMinPrice, finalMaxPrice, constrainedY } = calculateFinalPrices(clampedY)
+          const { finalMinPrice, finalMaxPrice, constrainedY, minTick, maxTick } =
+            calculateFinalPricesAndTicks(clampedY)
 
           // Update visual position of the dragged element
           updateElementPosition(d3.select(event.sourceEvent.target), constrainedY)
@@ -119,6 +129,8 @@ export function createDragActions(get: () => ChartStoreState) {
           actions.setChartState({
             minPrice: finalMinPrice,
             maxPrice: finalMaxPrice,
+            minTick,
+            maxTick,
           })
 
           // Update all related elements
@@ -126,18 +138,23 @@ export function createDragActions(get: () => ChartStoreState) {
         })
         .on('end', (event) => {
           const clampedY = clampYToChartBounds(event.y)
-          const { finalMinPrice, finalMaxPrice } = calculateFinalPrices(clampedY)
+          const { finalMinPrice, finalMaxPrice, minTick, maxTick } = calculateFinalPricesAndTicks(clampedY)
 
           // Update state for all other renderers
           actions.setChartState({
             minPrice: finalMinPrice,
             maxPrice: finalMaxPrice,
+            minTick,
+            maxTick,
           })
 
           // Call callbacks once when drag ends
           if (finalMinPrice !== undefined && finalMaxPrice !== undefined) {
-            actions.handlePriceChange('min', finalMinPrice)
-            actions.handlePriceChange('max', finalMaxPrice)
+            const { renderingContext } = get()
+            if (renderingContext) {
+              actions.handlePriceChange({ changeType: 'min', price: finalMinPrice, tick: minTick })
+              actions.handlePriceChange({ changeType: 'max', price: finalMaxPrice, tick: maxTick })
+            }
           }
         })
     },
@@ -168,31 +185,34 @@ export function createDragActions(get: () => ChartStoreState) {
         const draggedPrice = yToPrice(newCenterY)
 
         // Find the tick corresponding to the dragged center position
-        const centerTick = findClosestTick(liquidityData, draggedPrice)
+        const { tick: centerTick } = findClosestTick(liquidityData, draggedPrice)
 
-        if (centerTick) {
-          const tickIndices = calculateTickIndices(liquidityData)
-          const newRange = calculateNewRange({ centerTick, tickRangeSize, tickIndices, liquidityData })
+        const tickIndices = calculateTickIndices(liquidityData)
+        const newRange = calculateNewRange({ centerTick, tickRangeSize, tickIndices, liquidityData })
 
-          // Get data bounds to prevent dragging outside chart
-          const dataBounds = getDataBounds(priceData, liquidityData)
+        // Get data bounds to prevent dragging outside chart
+        const dataBounds = getDataBounds(priceData, liquidityData)
 
-          // Only update if range stays within data bounds
-          if (newRange.minPrice >= dataBounds.min && newRange.maxPrice <= dataBounds.max) {
-            // Update state for all renderers following Zustand pattern
-            actions.setChartState({
-              minPrice: newRange.minPrice,
-              maxPrice: newRange.maxPrice,
-            })
+        const { tick: minTickEntry } = findClosestTick(liquidityData, newRange.minPrice)
+        const { tick: maxTickEntry } = findClosestTick(liquidityData, newRange.maxPrice)
 
-            // Update all related elements
-            actions.drawAll()
+        // Only update if range stays within data bounds
+        if (newRange.minPrice >= dataBounds.min && newRange.maxPrice <= dataBounds.max) {
+          // Update state for all renderers following Zustand pattern
+          actions.setChartState({
+            minPrice: newRange.minPrice,
+            maxPrice: newRange.maxPrice,
+            minTick: minTickEntry.tick,
+            maxTick: maxTickEntry.tick,
+          })
 
-            // Call callbacks only when drag ends
-            if (isEnd) {
-              actions.handlePriceChange('min', newRange.minPrice)
-              actions.handlePriceChange('max', newRange.maxPrice)
-            }
+          // Update all related elements
+          actions.drawAll()
+
+          // Call callbacks only when drag ends
+          if (isEnd) {
+            actions.handlePriceChange({ changeType: 'min', price: newRange.minPrice, tick: minTickEntry.tick })
+            actions.handlePriceChange({ changeType: 'max', price: newRange.maxPrice, tick: maxTickEntry.tick })
           }
         }
       }
@@ -211,15 +231,13 @@ export function createDragActions(get: () => ChartStoreState) {
           dragOffsetY = event.y - currentRangeCenterY
 
           // Calculate and store the initial tick range size
-          const minTick = findClosestTick(liquidityData, minPrice)
-          const maxTick = findClosestTick(liquidityData, maxPrice)
+          const { tick: minTick } = findClosestTick(liquidityData, minPrice)
+          const { tick: maxTick } = findClosestTick(liquidityData, maxPrice)
 
-          if (minTick && maxTick) {
-            const tickIndices = calculateTickIndices(liquidityData)
-            const minIndex = tickIndices.find((t) => t.tick === minTick.tick)?.index || 0
-            const maxIndex = tickIndices.find((t) => t.tick === maxTick.tick)?.index || 0
-            tickRangeSize = Math.abs(maxIndex - minIndex)
-          }
+          const tickIndices = calculateTickIndices(liquidityData)
+          const minIndex = tickIndices.find((t) => t.tick === minTick.tick)?.index || 0
+          const maxIndex = tickIndices.find((t) => t.tick === maxTick.tick)?.index || 0
+          tickRangeSize = Math.abs(maxIndex - minIndex)
         })
         .on('drag', (event) => handleTickDrag({ event, isEnd: false }))
         .on('end', (event) => handleTickDrag({ event, isEnd: true }))

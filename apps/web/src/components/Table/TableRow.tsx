@@ -1,8 +1,4 @@
 import { Cell, flexRender, Row, RowData } from '@tanstack/react-table'
-import { ROW_HEIGHT_DESKTOP, ROW_HEIGHT_MOBILE_WEB } from 'components/Table/constants'
-import { CellContainer, DataRow, TableRowLink } from 'components/Table/styled'
-import { useTableSize } from 'components/Table/TableSizeProvider'
-import { getCommonPinningStyles } from 'components/Table/utils'
 import { memo, useMemo } from 'react'
 import { LinkProps } from 'react-router'
 import { Flex } from 'ui/src'
@@ -11,6 +7,10 @@ import { breakpoints } from 'ui/src/theme'
 import { ElementName } from 'uniswap/src/features/telemetry/constants'
 import Trace from 'uniswap/src/features/telemetry/Trace'
 import { useTrace } from 'utilities/src/telemetry/trace/TraceContext'
+import { ROW_HEIGHT_DESKTOP, ROW_HEIGHT_MOBILE_WEB } from '~/components/Table/constants'
+import { CellContainer, DataRow, TableRowLink } from '~/components/Table/styled'
+import { useTableSize } from '~/components/Table/TableSizeProvider'
+import { getCommonPinningStyles } from '~/components/Table/utils'
 
 interface TableCellProps<T extends RowData> {
   cell: Cell<T, unknown>

@@ -15,8 +15,16 @@
   "name": "app-development",
 
   "env": {
+    "development": {
+      "vars": {
+        "ENTRY_GATEWAY_API_URL": "https://entry-gateway.backend-dev.api.uniswap.org"
+      }
+    },
     "staging": {
       "name": "app-staging",
+      "vars": {
+        "ENTRY_GATEWAY_API_URL": "https://entry-gateway.backend-staging.api.uniswap.org"
+      },
       "observability": {
         "enabled": true,
         "head_sampling_rate": 1
@@ -24,6 +32,9 @@
     },
     "production": {
       "name": "app",
+      "vars": {
+        "ENTRY_GATEWAY_API_URL": "https://entry-gateway.backend-prod.api.uniswap.org"
+      },
       "observability": {
         "enabled": true,
         "head_sampling_rate": 1,

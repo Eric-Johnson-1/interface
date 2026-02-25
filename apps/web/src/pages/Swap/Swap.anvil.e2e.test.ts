@@ -1,16 +1,16 @@
 import { MaxUint160, MaxUint256, PERMIT2_ADDRESS } from '@uniswap/permit2-sdk'
 import { UNIVERSAL_ROUTER_ADDRESS, UniversalRouterVersion } from '@uniswap/universal-router-sdk'
 import { TradingApi } from '@universe/api'
-import { ONE_MILLION_USDT } from 'playwright/anvil/utils'
-import { expect, getTest } from 'playwright/fixtures'
-import { stubTradingApiEndpoint } from 'playwright/fixtures/tradingApi'
-import { TEST_WALLET_ADDRESS } from 'playwright/fixtures/wallets'
 import { USDT } from 'uniswap/src/constants/tokens'
 import { uniswapUrls } from 'uniswap/src/constants/urls'
 import { UniverseChainId } from 'uniswap/src/features/chains/types'
 import { TestID } from 'uniswap/src/test/fixtures/testIDs'
-import { assume0xAddress } from 'utils/wagmi'
 import { parseEther } from 'viem'
+import { ONE_MILLION_USDT } from '~/playwright/anvil/utils'
+import { expect, getTest } from '~/playwright/fixtures'
+import { stubTradingApiEndpoint } from '~/playwright/fixtures/tradingApi'
+import { TEST_WALLET_ADDRESS } from '~/playwright/fixtures/wallets'
+import { assume0xAddress } from '~/utils/wagmi'
 
 const test = getTest({ withAnvil: true })
 

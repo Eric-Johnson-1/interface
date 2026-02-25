@@ -1,10 +1,10 @@
-import { CHART_BEHAVIOR } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
-import { useChartPriceState } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/selectors/priceSelectors'
-import { ChartState } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
-import { boundPanY } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/boundPanY'
-import { calculateDynamicZoomMin } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/chartUtils'
-import { ChartEntry } from 'components/Charts/LiquidityRangeInput/types'
 import { useEffect } from 'react'
+import { CHART_BEHAVIOR } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
+import { useChartPriceState } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/selectors/priceSelectors'
+import { ChartState } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
+import { boundPanY } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/boundPanY'
+import { calculateDynamicZoomMin } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/utils/chartUtils'
+import { ChartEntry } from '~/components/Charts/LiquidityRangeInput/types'
 
 export function useLiquidityChartInteractions({
   svgRef,

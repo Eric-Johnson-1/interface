@@ -77,7 +77,7 @@ export function RelativeChangeText({
 
   const relativeChangeFormatted = useDerivedValue(() => {
     if (shouldUseSpotData.value) {
-      return spotRelativeChange
+      return spotRelativeChange?.value
         ? numberToPercentWorklet(spotRelativeChange.value, { precision: 2, absolute: true })
         : calculatedRelativeChange.formatted.value
     }
@@ -93,9 +93,6 @@ export function RelativeChangeText({
     return relativeChange.value > 0 ? colors.statusSuccess.val : colors.statusCritical.val
   })
 
-  const styles = useAnimatedStyle(() => ({
-    color: changeColor.value,
-  }))
   const caretStyle = useAnimatedStyle(() => ({
     color: changeColor.value,
     transform: [
@@ -131,7 +128,7 @@ export function RelativeChangeText({
       {/* Must always mount this component to avoid stale values on initial render */}
       <Flex row alignItems="center" gap="$spacing2" style={{ opacity: loading ? 0 : 1 }}>
         <AnimatedCaretChange size="$icon.16" strokeWidth={2} style={caretStyle} />
-        <AnimatedText style={styles} testID="relative-change-text" text={combinedText} variant="body1" />
+        <AnimatedText testID="relative-change-text" text={combinedText} variant="body1" color="$neutral2" />
       </Flex>
     </Flex>
   )

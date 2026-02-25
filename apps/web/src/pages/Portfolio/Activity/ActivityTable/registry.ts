@@ -1,14 +1,22 @@
 import { UNI_ADDRESSES } from '@uniswap/sdk-core'
-import { ActivityProtocolInfo, ActivityRowFragments } from 'pages/Portfolio/Activity/ActivityTable/activityTableModels'
-import { ActivityFilterType } from 'pages/Portfolio/Activity/Filters/utils'
 import { AssetType } from 'uniswap/src/entities/assets'
+import { mapTAPIPlanStatusToTXStatus } from 'uniswap/src/features/activity/extract/statusMappers'
 import {
   DappInfoTransactionDetails,
   TransactionDetails,
+  TransactionStatus,
   TransactionType,
+  TransactionTypeInfo,
 } from 'uniswap/src/features/transactions/types/transactionDetails'
+import { isPlanTransactionDetails } from 'uniswap/src/features/transactions/types/utils'
 import { getValidAddress } from 'uniswap/src/utils/addresses'
-import { buildCurrencyId } from 'uniswap/src/utils/currencyId'
+import { buildCurrencyId, buildNativeCurrencyId, isNativeCurrencyAddress } from 'uniswap/src/utils/currencyId'
+import { logger } from 'utilities/src/logger/logger'
+import {
+  ActivityProtocolInfo,
+  ActivityRowFragments,
+} from '~/pages/Portfolio/Activity/ActivityTable/activityTableModels'
+import { ActivityFilterType } from '~/pages/Portfolio/Activity/Filters/utils'
 
 function toProtocolInfo(dappInfo: DappInfoTransactionDetails | undefined): ActivityProtocolInfo | null {
   if (!dappInfo?.name) {
@@ -43,6 +51,9 @@ const fragmentsCache = new Map<string, ActivityRowFragments>()
  * Uses chainId and id which are stable identifiers that persist across refetches.
  */
 function getTransactionCacheKey(details: TransactionDetails): string {
+  if (details.typeInfo.type === TransactionType.Plan) {
+    return `${details.chainId}:${details.id}:${details.typeInfo.planStatus}`
+  }
   return `${details.chainId}:${details.id}`
 }
 
@@ -103,7 +114,31 @@ function buildActivityRowFragmentsInternal(details: TransactionDetails): Activit
         },
         protocolInfo: toProtocolInfo(typeInfo.dappInfo),
       }
-
+    case TransactionType.Plan: {
+      if (!isPlanTransactionDetails(details)) {
+        logInvalidTransactionType(typeInfo)
+        return {}
+      }
+      const status = mapTAPIPlanStatusToTXStatus(typeInfo.planStatus)
+      const overrideLabelKey =
+        status === TransactionStatus.Success
+          ? 'transaction.status.swap.success'
+          : 'transaction.status.plan.interruptedShort'
+      return {
+        amount: {
+          kind: 'pair',
+          inputCurrencyId: typeInfo.inputCurrencyId,
+          outputCurrencyId: typeInfo.outputCurrencyId,
+          inputAmountRaw: typeInfo.inputCurrencyAmountRaw,
+          outputAmountRaw: typeInfo.outputCurrencyAmountRaw,
+        },
+        counterparty: null,
+        typeLabel: {
+          baseGroup: ActivityFilterType.Swaps,
+          overrideLabelKey,
+        },
+      }
+    }
     case TransactionType.Bridge:
       return {
         amount: {
@@ -328,6 +363,82 @@ function buildActivityRowFragmentsInternal(details: TransactionDetails): Activit
       }
     }
 
+    case TransactionType.ToucanBid: {
+      const currencyId = isNativeCurrencyAddress(chainId, typeInfo.bidTokenAddress)
+        ? buildNativeCurrencyId(chainId)
+        : buildCurrencyId(chainId, typeInfo.bidTokenAddress)
+      return {
+        amount: {
+          kind: 'single',
+          currencyId,
+          amountRaw: typeInfo.amountRaw,
+        },
+        counterparty: null,
+        typeLabel: {
+          baseGroup: ActivityFilterType.Sends,
+          overrideLabelKey: 'transaction.status.submitBid.success',
+        },
+        protocolInfo: toProtocolInfo(typeInfo.dappInfo),
+      }
+    }
+
+    case TransactionType.AuctionBid: {
+      const currencyId = isNativeCurrencyAddress(chainId, typeInfo.bidTokenAddress)
+        ? buildNativeCurrencyId(chainId)
+        : buildCurrencyId(chainId, typeInfo.bidTokenAddress)
+      return {
+        amount: {
+          kind: 'single',
+          currencyId,
+          amountRaw: typeInfo.amountRaw,
+        },
+        counterparty: null,
+        typeLabel: {
+          baseGroup: ActivityFilterType.Sends,
+          overrideLabelKey: 'transaction.status.submitBid.success',
+        },
+        protocolInfo: toProtocolInfo(typeInfo.dappInfo),
+      }
+    }
+
+    case TransactionType.AuctionClaimed: {
+      const currencyId = isNativeCurrencyAddress(chainId, typeInfo.tokenAddress)
+        ? buildNativeCurrencyId(chainId)
+        : buildCurrencyId(chainId, typeInfo.tokenAddress)
+      return {
+        amount: {
+          kind: 'single',
+          currencyId,
+          amountRaw: typeInfo.amountRaw,
+        },
+        counterparty: null,
+        typeLabel: {
+          baseGroup: ActivityFilterType.Receives,
+          overrideLabelKey: 'transaction.status.auctionClaimed.success',
+        },
+        protocolInfo: toProtocolInfo(typeInfo.dappInfo),
+      }
+    }
+
+    case TransactionType.AuctionExited: {
+      const currencyId = isNativeCurrencyAddress(chainId, typeInfo.tokenAddress)
+        ? buildNativeCurrencyId(chainId)
+        : buildCurrencyId(chainId, typeInfo.tokenAddress)
+      return {
+        amount: {
+          kind: 'single',
+          currencyId,
+          amountRaw: typeInfo.amountRaw,
+        },
+        counterparty: null,
+        typeLabel: {
+          baseGroup: ActivityFilterType.Receives,
+          overrideLabelKey: 'transaction.status.withdrawBid.success',
+        },
+        protocolInfo: toProtocolInfo(typeInfo.dappInfo),
+      }
+    }
+
     case TransactionType.ClaimUni: {
       const tokenAddress = UNI_ADDRESSES[chainId]
       const currencyId = tokenAddress ? buildCurrencyId(chainId, tokenAddress) : undefined
@@ -363,4 +474,16 @@ function buildActivityRowFragmentsInternal(details: TransactionDetails): Activit
     default:
       return {}
   }
+}
+
+const logInvalidTransactionType = (typeInfo: TransactionTypeInfo): void => {
+  logger.error(new Error('Invalid transaction type ' + typeInfo.type), {
+    tags: {
+      file: 'buildActivityRowFragments',
+      function: 'buildActivityRowFragmentsInternal',
+    },
+    extra: {
+      typeInfo,
+    },
+  })
 }

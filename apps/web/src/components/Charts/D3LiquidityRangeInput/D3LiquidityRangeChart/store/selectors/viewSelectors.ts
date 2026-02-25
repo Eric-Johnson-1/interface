@@ -1,8 +1,8 @@
-import { LiquidityChartStoreContext } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/LiquidityChartStoreContext'
 import { useContext } from 'react'
 import { useLocalizationContext } from 'uniswap/src/features/language/LocalizationContext'
 import { useStore } from 'zustand'
 import { useShallow } from 'zustand/react/shallow'
+import { LiquidityChartStoreContext } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/LiquidityChartStoreContext'
 
 function useLiquidityChartStore() {
   const store = useContext(LiquidityChartStoreContext)

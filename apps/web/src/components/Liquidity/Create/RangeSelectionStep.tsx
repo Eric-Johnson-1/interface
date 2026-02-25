@@ -1,30 +1,28 @@
 /* eslint-disable max-lines */
 import { ProtocolVersion } from '@uniswap/client-data-api/dist/data/v1/poolTypes_pb'
-import { FeatureFlags, useFeatureFlag } from '@universe/gating'
-import { D3LiquidityRangeInput } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeInput'
-import { LiquidityRangeInput } from 'components/Charts/LiquidityRangeInput/LiquidityRangeInput'
-import { useDefaultInitialPrice } from 'components/Liquidity/Create/hooks/useDefaultInitialPrice'
-import { useTokenControlOptions } from 'components/Liquidity/Create/hooks/useTokenControlOptions'
-import { PoolOutOfSyncError } from 'components/Liquidity/Create/PoolOutOfSyncError'
-import { PositionOutOfRangeError } from 'components/Liquidity/Create/PositionOutOfRangeError'
-import { RangeAmountInput, RangeSelectionInput } from 'components/Liquidity/Create/RangeAmountInput'
-import { PriceRangeState } from 'components/Liquidity/Create/types'
-import { DisplayCurrentPrice } from 'components/Liquidity/DisplayCurrentPrice'
-import { PositionInfo } from 'components/Liquidity/types'
-import { getBaseAndQuoteCurrencies } from 'components/Liquidity/utils/currency'
-import { getPriceDifference } from 'components/Liquidity/utils/getPriceDifference'
-import { isInvalidPrice, isInvalidRange } from 'components/Liquidity/utils/priceRangeInfo'
-import { useCreateLiquidityContext } from 'pages/CreatePosition/CreateLiquidityContextProvider'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { useRangeHopCallbacks } from 'state/mint/v3/hooks'
-import { tryParsePrice } from 'state/mint/v3/utils'
-import { PositionField } from 'types/position'
 import { AnimatePresence, Button, Flex, SegmentedControl, Text, useMedia, useSporeColors } from 'ui/src'
 import { AlertTriangleFilled } from 'ui/src/components/icons/AlertTriangleFilled'
 import { fonts, zIndexes } from 'ui/src/theme'
 import { AmountInput } from 'uniswap/src/components/AmountInput/AmountInput'
 import { WarningSeverity } from 'uniswap/src/components/modals/WarningModal/types'
+import { D3LiquidityRangeInput } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeInput'
+import { useDefaultInitialPrice } from '~/components/Liquidity/Create/hooks/useDefaultInitialPrice'
+import { useTokenControlOptions } from '~/components/Liquidity/Create/hooks/useTokenControlOptions'
+import { PoolOutOfSyncError } from '~/components/Liquidity/Create/PoolOutOfSyncError'
+import { PoolParsingError } from '~/components/Liquidity/Create/PoolParsingError'
+import { PositionOutOfRangeError } from '~/components/Liquidity/Create/PositionOutOfRangeError'
+import { RangeSelectionInput } from '~/components/Liquidity/Create/RangeAmountInput'
+import { PriceRangeState } from '~/components/Liquidity/Create/types'
+import { DisplayCurrentPrice } from '~/components/Liquidity/DisplayCurrentPrice'
+import { PositionInfo } from '~/components/Liquidity/types'
+import { getBaseAndQuoteCurrencies } from '~/components/Liquidity/utils/currency'
+import { getPriceDifference } from '~/components/Liquidity/utils/getPriceDifference'
+import { isInvalidPrice, isInvalidRange } from '~/components/Liquidity/utils/priceRangeInfo'
+import { useCreateLiquidityContext } from '~/pages/CreatePosition/CreateLiquidityContextProvider'
+import { tryParsePrice } from '~/state/mint/v3/utils'
+import { PositionField } from '~/types/position'
 
 enum RangeSelection {
   FULL = 'FULL',
@@ -293,7 +291,6 @@ export const SelectPriceRangeStep = ({
   disableContinue?: boolean
 }) => {
   const { t } = useTranslation()
-  const isD3LiquidityRangeChartEnabled = useFeatureFlag(FeatureFlags.D3LiquidityRangeChart)
 
   const {
     positionState: { fee, hook, initialPosition },
@@ -306,7 +303,6 @@ export const SelectPriceRangeStep = ({
     price,
     ticks,
     pricesAtTicks,
-    ticksAtLimit,
     priceRangeState,
     setPriceRangeState,
   } = useCreateLiquidityContext()
@@ -331,35 +327,6 @@ export const SelectPriceRangeStep = ({
     [TOKEN0?.symbol, setPriceRangeState],
   )
 
-  const { getDecrementLower, getIncrementLower, getDecrementUpper, getIncrementUpper } = useRangeHopCallbacks(
-    protocolVersion === ProtocolVersion.V3
-      ? {
-          baseCurrency,
-          quoteCurrency,
-          feeAmount: fee?.feeAmount,
-          tickLower: ticks[0],
-          tickUpper: ticks[1],
-          pool: poolOrPair,
-        }
-      : protocolVersion === ProtocolVersion.V4
-        ? {
-            baseCurrency,
-            quoteCurrency,
-            fee,
-            tickLower: ticks[0],
-            tickUpper: ticks[1],
-            pool: poolOrPair,
-          }
-        : {
-            baseCurrency: undefined,
-            quoteCurrency: undefined,
-            feeAmount: undefined,
-            tickLower: undefined,
-            tickUpper: undefined,
-            pool: undefined,
-          },
-  )
-
   const handleSelectRange = useCallback(
     (option: RangeSelection) => {
       if (initialPosition?.isOutOfRange) {
@@ -371,6 +338,8 @@ export const SelectPriceRangeStep = ({
           ...prevState,
           minPrice: '',
           maxPrice: '',
+          minTick: undefined,
+          maxTick: undefined,
           fullRange: true,
         }))
       } else {
@@ -396,25 +365,14 @@ export const SelectPriceRangeStep = ({
     },
   ]
 
-  const rangeSelectionInputValues = useMemo(() => {
-    if (initialPosition?.isOutOfRange) {
-      return [pricesAtTicks[0]?.toSignificant(8) ?? '', pricesAtTicks[1]?.toSignificant(8) ?? '']
-    }
-
-    return [
-      ticksAtLimit[0] ? '0' : (pricesAtTicks[0]?.toSignificant(8) ?? ''),
-      ticksAtLimit[1] ? '∞' : (pricesAtTicks[1]?.toSignificant(8) ?? ''),
-    ]
-  }, [pricesAtTicks, ticksAtLimit, initialPosition])
-
   const handleChartRangeInput = useCallback(
-    (input: RangeSelectionInput, value: string | undefined) => {
+    ({ input, value, tick }: { input: RangeSelectionInput; value: string | undefined; tick?: number }) => {
       if (priceRangeState.fullRange || initialPosition?.isOutOfRange) {
         return
       } else if (input === RangeSelectionInput.MIN) {
-        setPriceRangeState((prev) => ({ ...prev, minPrice: value, fullRange: false }))
+        setPriceRangeState((prev) => ({ ...prev, minPrice: value, minTick: tick, fullRange: false }))
       } else {
-        setPriceRangeState((prev) => ({ ...prev, maxPrice: value, fullRange: false }))
+        setPriceRangeState((prev) => ({ ...prev, maxPrice: value, maxTick: tick, fullRange: false }))
       }
     },
     [priceRangeState.fullRange, initialPosition?.isOutOfRange, setPriceRangeState],
@@ -449,8 +407,8 @@ export const SelectPriceRangeStep = ({
       return
     }
 
-    handleChartRangeInput(RangeSelectionInput.MIN, '')
-    handleChartRangeInput(RangeSelectionInput.MAX, '')
+    handleChartRangeInput({ input: RangeSelectionInput.MIN, value: '' })
+    handleChartRangeInput({ input: RangeSelectionInput.MAX, value: '' })
   }, [handleChartRangeInput, initialPosition?.isOutOfRange])
 
   // If no pool is found for custom range, set min/max price to defaults
@@ -470,7 +428,6 @@ export const SelectPriceRangeStep = ({
   }
 
   const isDisabled = initialPosition?.isOutOfRange
-  const showIncrementButtons = !!poolOrPair && !priceRangeState.fullRange
 
   return (
     <>
@@ -501,6 +458,7 @@ export const SelectPriceRangeStep = ({
         )}
         <PositionOutOfRangeError positionInfo={positionInfo} />
         <PoolOutOfSyncError />
+        <PoolParsingError formComplete />
         <Flex gap="$gap4" opacity={isDisabled ? 0.6 : 1}>
           {isDisabled && (
             <Flex
@@ -515,121 +473,42 @@ export const SelectPriceRangeStep = ({
               zIndex={zIndexes.overlay}
             />
           )}
-          {baseCurrency &&
-            quoteCurrency &&
-            fee &&
-            (isD3LiquidityRangeChartEnabled ? (
-              <D3LiquidityRangeInput
-                key={buildRangeInputKeyV2({ protocolVersion, poolId: poolId ?? '', priceRangeState })}
-                baseCurrency={baseCurrency}
-                quoteCurrency={quoteCurrency}
-                sdkCurrencies={currencies.sdk}
-                creatingPoolOrPair={creatingPoolOrPair}
-                currencyControlOptions={controlOptions}
-                priceInverted={priceRangeState.priceInverted}
-                feeTier={fee.feeAmount}
-                hook={hook}
-                tickSpacing={poolOrPair?.tickSpacing}
-                protocolVersion={protocolVersion}
-                poolId={poolId}
-                poolOrPairLoading={poolOrPairLoading}
-                price={price}
-                currentPrice={Number(price?.toSignificant())}
-                inputMode={priceRangeState.inputMode}
-                initialPosition={initialPosition}
-                minPrice={rangeInputMinPrice}
-                maxPrice={rangeInputMaxPrice}
-                isFullRange={priceRangeState.fullRange}
-                handleSelectToken={handleSelectToken}
-                setMinPrice={(minPrice?: number | null) => {
-                  handleChartRangeInput(RangeSelectionInput.MIN, minPrice?.toString())
-                }}
-                setMaxPrice={(maxPrice?: number | null) => {
-                  handleChartRangeInput(RangeSelectionInput.MAX, maxPrice?.toString())
-                }}
-                setIsFullRange={(isFullRange: boolean) => {
-                  handleSelectRange(isFullRange ? RangeSelection.FULL : RangeSelection.CUSTOM)
-                }}
-                setInputMode={(inputMode) => {
-                  setPriceRangeState((prev) => ({ ...prev, inputMode }))
-                }}
-              />
-            ) : (
-              <Flex
-                backgroundColor="$surface2"
-                gap="$gap16"
-                borderRadius={poolId ? '$none' : '$rounded20'}
-                borderTopLeftRadius={poolId ? '$rounded20' : '$none'}
-                borderTopRightRadius={poolId ? '$rounded20' : '$none'}
-              >
-                <Flex
-                  row
-                  justifyContent="space-between"
-                  alignItems="center"
-                  p="$padding16"
-                  $sm={{ row: false, alignItems: 'flex-start', gap: '$gap8' }}
-                >
-                  <DisplayCurrentPrice price={price} isLoading={poolOrPairLoading} />
-                  {!creatingPoolOrPair && (
-                    <SegmentedControl
-                      options={controlOptions}
-                      selectedOption={baseCurrency.symbol ?? ''}
-                      onSelectOption={handleSelectToken}
-                      size="smallThumbnail"
-                    />
-                  )}
-                </Flex>
-                <Flex p="$padding16">
-                  <LiquidityRangeInput
-                    key={buildRangeInputKey({ protocolVersion, poolId: poolId ?? '', priceRangeState })}
-                    quoteCurrency={quoteCurrency}
-                    baseCurrency={baseCurrency}
-                    sdkCurrencies={currencies.sdk}
-                    priceInverted={priceRangeState.priceInverted}
-                    feeTier={fee.feeAmount}
-                    hook={hook}
-                    tickSpacing={poolOrPair?.tickSpacing}
-                    protocolVersion={protocolVersion}
-                    poolId={poolId}
-                    poolOrPairLoading={poolOrPairLoading}
-                    disableBrushInteraction={priceRangeState.fullRange}
-                    midPrice={Number(price?.toSignificant())}
-                    minPrice={rangeInputMinPrice}
-                    maxPrice={rangeInputMaxPrice}
-                    setMinPrice={(minPrice?: number) => {
-                      handleChartRangeInput(RangeSelectionInput.MIN, minPrice?.toString())
-                    }}
-                    setMaxPrice={(maxPrice?: number) => {
-                      handleChartRangeInput(RangeSelectionInput.MAX, maxPrice?.toString())
-                    }}
-                    setFallbackRangePrices={setFallbackRangePrices}
-                  />
-                </Flex>
-              </Flex>
-            ))}
-          {isD3LiquidityRangeChartEnabled ? null : (
-            <Flex row gap="$gap4" $lg={{ row: false }}>
-              <RangeAmountInput
-                input={RangeSelectionInput.MIN}
-                decrement={priceRangeState.priceInverted ? getIncrementUpper : getDecrementLower}
-                increment={priceRangeState.priceInverted ? getDecrementUpper : getIncrementLower}
-                isIncrementDisabled={false}
-                isDecrementDisabled={ticksAtLimit[0]}
-                value={rangeSelectionInputValues[0]}
-                showIncrementButtons={showIncrementButtons}
-                isInvalid={invalidRange}
-              />
-              <RangeAmountInput
-                input={RangeSelectionInput.MAX}
-                decrement={priceRangeState.priceInverted ? getIncrementLower : getDecrementUpper}
-                increment={priceRangeState.priceInverted ? getDecrementLower : getIncrementUpper}
-                isIncrementDisabled={ticksAtLimit[1]}
-                isDecrementDisabled={false}
-                value={rangeSelectionInputValues[1]}
-                showIncrementButtons={showIncrementButtons}
-                isInvalid={invalidRange}
-              />
-            </Flex>
+          {baseCurrency && quoteCurrency && fee && (
+            <D3LiquidityRangeInput
+              key={buildRangeInputKey({ protocolVersion, poolId: poolId ?? '', priceRangeState })}
+              baseCurrency={baseCurrency}
+              quoteCurrency={quoteCurrency}
+              sdkCurrencies={currencies.sdk}
+              creatingPoolOrPair={creatingPoolOrPair}
+              currencyControlOptions={controlOptions}
+              priceInverted={priceRangeState.priceInverted}
+              feeTier={fee.feeAmount}
+              hook={hook}
+              tickSpacing={poolOrPair?.tickSpacing}
+              protocolVersion={protocolVersion}
+              poolId={poolId}
+              poolOrPairLoading={poolOrPairLoading}
+              price={price}
+              currentPrice={Number(price?.toSignificant())}
+              inputMode={priceRangeState.inputMode}
+              initialPosition={initialPosition}
+              minPrice={rangeInputMinPrice}
+              maxPrice={rangeInputMaxPrice}
+              isFullRange={priceRangeState.fullRange}
+              handleSelectToken={handleSelectToken}
+              setMinPrice={(price, tick) => {
+                handleChartRangeInput({ input: RangeSelectionInput.MIN, value: price?.toString(), tick })
+              }}
+              setMaxPrice={(price, tick) => {
+                handleChartRangeInput({ input: RangeSelectionInput.MAX, value: price?.toString(), tick })
+              }}
+              setIsFullRange={(isFullRange: boolean) => {
+                handleSelectRange(isFullRange ? RangeSelection.FULL : RangeSelection.CUSTOM)
+              }}
+              setInputMode={(inputMode) => {
+                setPriceRangeState((prev) => ({ ...prev, inputMode }))
+              }}
+            />
           )}
         </Flex>
         {(invalidPrice || invalidRange) && (
@@ -653,18 +532,6 @@ export const SelectPriceRangeStep = ({
 }
 
 function buildRangeInputKey({
-  protocolVersion,
-  poolId,
-  priceRangeState,
-}: {
-  protocolVersion: ProtocolVersion
-  poolId: string
-  priceRangeState: PriceRangeState
-}) {
-  return `${poolId}-${priceRangeState.fullRange}-${priceRangeState.priceInverted}-${protocolVersion}`
-}
-
-function buildRangeInputKeyV2({
   protocolVersion,
   poolId,
   priceRangeState,

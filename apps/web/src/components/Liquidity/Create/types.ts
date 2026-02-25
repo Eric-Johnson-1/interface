@@ -3,9 +3,9 @@ import { Currency, Price, Token } from '@uniswap/sdk-core'
 import { Pair } from '@uniswap/v2-sdk'
 import { FeeAmount, TICK_SPACINGS, Pool as V3Pool } from '@uniswap/v3-sdk'
 import { Pool as V4Pool } from '@uniswap/v4-sdk'
-import { PositionField } from 'types/position'
 import { WarningSeverity } from 'uniswap/src/components/modals/WarningModal/types'
 import { DEFAULT_TICK_SPACING, DYNAMIC_FEE_AMOUNT } from 'uniswap/src/constants/pools'
+import { PositionField } from '~/types/position'
 
 export type FeeData = {
   isDynamic: boolean
@@ -122,6 +122,8 @@ export interface PriceRangeState {
   // When these are undefined, LiquidityChartRangeInput will calculate and set reasonable default values.
   minPrice?: string
   maxPrice?: string
+  minTick?: number
+  maxTick?: number
   inputMode?: RangeAmountInputPriceMode
 }
 

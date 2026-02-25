@@ -11,6 +11,8 @@ import {
   Pool as V3Pool,
 } from '@uniswap/v3-sdk'
 import { priceToClosestTick as priceToClosestV4Tick, Pool as V4Pool } from '@uniswap/v4-sdk'
+import JSBI from 'jsbi'
+import { ZERO_ADDRESS } from 'uniswap/src/constants/misc'
 import {
   CreatePositionInfo,
   CreateV2PositionInfo,
@@ -23,15 +25,13 @@ import {
   V2PriceRangeInfo,
   V3PriceRangeInfo,
   V4PriceRangeInfo,
-} from 'components/Liquidity/Create/types'
-import { getBaseAndQuoteCurrencies } from 'components/Liquidity/utils/currency'
-import JSBI from 'jsbi'
-import tryParseCurrencyAmount from 'lib/utils/tryParseCurrencyAmount'
-import { tryParsePrice, tryParseTick } from 'state/mint/v3/utils'
-import { PositionField } from 'types/position'
-import { ZERO_ADDRESS } from 'uniswap/src/constants/misc'
+} from '~/components/Liquidity/Create/types'
+import { getBaseAndQuoteCurrencies } from '~/components/Liquidity/utils/currency'
+import tryParseCurrencyAmount from '~/lib/utils/tryParseCurrencyAmount'
+import { tryParsePrice, tryParseTick } from '~/state/mint/v3/utils'
+import { PositionField } from '~/types/position'
 
-import { getTickToPrice, getV4TickToPrice } from 'utils/getTickToPrice'
+import { getTickToPrice, getV4TickToPrice } from '~/utils/getTickToPrice'
 
 function getTicksAtLimit({
   lowerTick,

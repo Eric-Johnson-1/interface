@@ -1,5 +1,3 @@
-import { MouseoverTooltip, TooltipSize } from 'components/Tooltip'
-import { useOnClickOutside } from 'hooks/useOnClickOutside'
 import { useEffect, useRef, useState } from 'react'
 import {
   AnimatePresence,
@@ -14,6 +12,9 @@ import {
   WebBottomSheet,
 } from 'ui/src'
 import { INTERFACE_NAV_HEIGHT, zIndexes } from 'ui/src/theme'
+import { useEvent } from 'utilities/src/react/hooks'
+import { MouseoverTooltip, TooltipSize } from '~/components/Tooltip'
+import { useOnClickOutside } from '~/hooks/useOnClickOutside'
 
 const DropdownContent = styled(Text, {
   display: 'flex',
@@ -80,10 +81,13 @@ export interface SharedDropdownProps {
   positionFixed?: boolean // used to determine if fixed dropdown should be flipped
   forceFlipUp?: boolean // force dropdown to render above trigger
   children: JSX.Element | JSX.Element[]
+  ignoredNodes?: React.RefObject<HTMLElement | undefined | null>[] // nodes to ignore for click-outside handling
+  ignoreDialogClicks?: boolean // ignore clicks on dialog/modal elements
 }
 
 type AdaptiveDropdownProps = SharedDropdownProps & {
-  trigger: JSX.Element
+  trigger?: JSX.Element // optional when dropdown is controlled externally
+  adaptWhen?: 'sm' | 'md'
 }
 
 export function AdaptiveDropdown({
@@ -100,14 +104,22 @@ export function AdaptiveDropdown({
   positionFixed,
   forceFlipUp,
   children,
+  ignoredNodes,
+  ignoreDialogClicks,
+  adaptWhen = 'sm',
 }: AdaptiveDropdownProps) {
   const node = useRef<HTMLDivElement | null>(null)
   const dropdownNode = useRef<HTMLDivElement | null>(null)
-  useOnClickOutside({ node, handler: () => isOpen && toggleOpen(false) })
   const scrollbarStyles = useScrollbarStyles()
   const shadowProps = useShadowPropsMedium()
   const media = useMedia()
-  const isSheet = !!adaptToSheet && media.sm
+  const isSheet = !!adaptToSheet && media[adaptWhen]
+  const handleClickOutside = useEvent(() => {
+    if (isOpen) {
+      toggleOpen(false)
+    }
+  })
+  useOnClickOutside({ node, handler: isSheet ? undefined : handleClickOutside, ignoredNodes, ignoreDialogClicks })
   const [flipVertical, setFlipVertical] = useState(false)
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: +dropdownNode, +node
@@ -127,7 +139,8 @@ export function AdaptiveDropdown({
     <>
       {!isSheet && (
         <VisuallyHidden>
-          <Flex ref={dropdownNode}>
+          {/* This hidden copy is only for measuring dropdown height - data-testid-ignore lets tests filter it out */}
+          <Flex ref={dropdownNode} data-testid-ignore>
             {/* hidden node cannot be position absolute or else height will register as 0 */}
             <DropdownContent
               animation="fastHeavy"
@@ -145,15 +158,17 @@ export function AdaptiveDropdown({
       {/* biome-ignore lint/correctness/noRestrictedElements: needed here */}
       <div ref={node} style={{ width: '100%', ...containerStyle }}>
         <DropdownContainer>
-          <MouseoverTooltip
-            disabled={!tooltipText || isOpen}
-            text={tooltipText}
-            size={TooltipSize.Max}
-            placement="top"
-            style={{ width: '100%' }}
-          >
-            {trigger}
-          </MouseoverTooltip>
+          {trigger && (
+            <MouseoverTooltip
+              disabled={!tooltipText || isOpen}
+              text={tooltipText}
+              size={TooltipSize.Max}
+              placement="top"
+              style={{ width: '100%' }}
+            >
+              {trigger}
+            </MouseoverTooltip>
+          )}
           <AnimatePresence>
             {isOpen && !isSheet && (
               <DropdownContent
@@ -164,7 +179,7 @@ export function AdaptiveDropdown({
                 style={scrollbarStyles}
                 positionRight={alignRight}
                 positionTop={flipVertical}
-                position="absolute"
+                position={trigger ? 'absolute' : 'relative'}
               >
                 {children}
               </DropdownContent>
@@ -177,6 +192,7 @@ export function AdaptiveDropdown({
           isOpen={isOpen}
           onClose={() => toggleOpen(false)}
           maxHeight={`calc(100dvh - ${INTERFACE_NAV_HEIGHT}px)`}
+          testID={dropdownTestId}
         >
           {children}
         </WebBottomSheet>

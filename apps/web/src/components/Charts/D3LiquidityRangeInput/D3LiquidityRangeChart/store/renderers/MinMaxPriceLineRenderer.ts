@@ -1,11 +1,11 @@
-import { CHART_DIMENSIONS } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
+import * as d3 from 'd3'
+import { CHART_DIMENSIONS } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
 import type {
   ChartActions,
   ChartState,
   Renderer,
   RenderingContext,
-} from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
-import * as d3 from 'd3'
+} from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/store/types'
 
 const SOLID_PRICE_LINE_CLASSES = {
   MIN_LINE: 'min-price-line',

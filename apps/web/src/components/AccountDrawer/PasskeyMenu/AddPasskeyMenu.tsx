@@ -1,9 +1,5 @@
-import { GenericPasskeyMenuModal, PasskeyMenuModalState } from 'components/AccountDrawer/PasskeyMenu/PasskeyMenuModal'
-import { useAccount } from 'hooks/useAccount'
-import { usePasskeyAuthWithHelpModal } from 'hooks/usePasskeyAuthWithHelpModal'
 import { Dispatch, SetStateAction } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ClickableTamaguiStyle } from 'theme/components/styles'
 import { Flex, Loader, Text, TouchableArea } from 'ui/src'
 import { Chevron } from 'ui/src/components/icons/Chevron'
 import { Cloud } from 'ui/src/components/icons/Cloud'
@@ -14,6 +10,10 @@ import { useUnitagsAddressQuery } from 'uniswap/src/data/apiClients/unitagsApi/u
 import { AuthenticatorAttachment, registerNewAuthenticator } from 'uniswap/src/features/passkey/embeddedWallet'
 import { ElementName, ModalName } from 'uniswap/src/features/telemetry/constants'
 import Trace from 'uniswap/src/features/telemetry/Trace'
+import { GenericPasskeyMenuModal, PasskeyMenuModalState } from '~/components/AccountDrawer/PasskeyMenu/PasskeyMenuModal'
+import { useAccount } from '~/hooks/useAccount'
+import { usePasskeyAuthWithHelpModal } from '~/hooks/usePasskeyAuthWithHelpModal'
+import { ClickableTamaguiStyle } from '~/theme/components/styles'
 
 export function AddPasskeyMenu({
   show,

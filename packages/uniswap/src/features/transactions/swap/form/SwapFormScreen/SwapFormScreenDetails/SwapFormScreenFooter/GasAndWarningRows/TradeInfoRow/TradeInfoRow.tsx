@@ -1,7 +1,6 @@
 import { Accordion, Flex, Text } from 'ui/src'
 import { AlertTriangleFilled } from 'ui/src/components/icons/AlertTriangleFilled'
 import { RotatableChevron } from 'ui/src/components/icons/RotatableChevron'
-import { iconSizes } from 'ui/src/theme'
 import { getAlertColor } from 'uniswap/src/components/modals/WarningModal/getAlertColor'
 import type { Warning } from 'uniswap/src/components/modals/WarningModal/types'
 import { WarningLabel } from 'uniswap/src/components/modals/WarningModal/types'
@@ -79,13 +78,7 @@ export function TradeInfoRow({ gasInfo, warning }: { gasInfo: GasInfo; warning?:
           {({ open }: { open: boolean }) => (
             <Flex row gap="$spacing4" alignItems="center">
               <GasInfoRow gasInfo={gasInfo} hidden={open} />
-              <RotatableChevron
-                animation="fast"
-                width={iconSizes.icon16}
-                height={iconSizes.icon16}
-                direction={open ? 'up' : 'down'}
-                color="$neutral3"
-              />
+              <RotatableChevron animation="fast" size="$icon.16" direction={open ? 'up' : 'down'} color="$neutral3" />
             </Flex>
           )}
         </Accordion.Trigger>

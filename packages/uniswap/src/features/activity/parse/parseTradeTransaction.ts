@@ -18,6 +18,7 @@ import {
   TransactionType,
   WrapTransactionInfo,
 } from 'uniswap/src/features/transactions/types/transactionDetails'
+import { areAddressesEqual } from 'uniswap/src/utils/addresses'
 import { buildCurrencyId, buildNativeCurrencyId, buildWrappedNativeCurrencyId } from 'uniswap/src/utils/currencyId'
 
 type TransferAssetChange = Extract<
@@ -250,6 +251,29 @@ function getTotalAmountForToken(transfers: OnChainTransaction['transfers'], toke
 }
 
 /**
+ * Filters out FOT (Fee-on-Transfer) fee transfers that don't go to/from the owner.
+ * FOT tokens cause Zerion to return multiple transfers - one for the actual amount
+ * (to/from the owner) and one for the fee (to a different address).
+ */
+function excludeFOTFeeTransfers(
+  transfers: OnChainTransaction['transfers'],
+  { ownerAddress, chainId, direction }: { ownerAddress: string; chainId: number; direction: 'sent' | 'received' },
+): OnChainTransaction['transfers'] {
+  return transfers.filter((t) => {
+    // Only filter FOT tokens
+    if (t.asset.case !== 'token' || !t.asset.value.metadata?.feeData?.feeDetector?.feeTakenOnTransfer) {
+      return true
+    }
+    // For FOT tokens, only keep transfers to/from the owner
+    const addressToCheck = direction === 'received' ? t.to : t.from
+    return areAddressesEqual({
+      addressInput1: { address: addressToCheck, chainId },
+      addressInput2: { address: ownerAddress, chainId },
+    })
+  })
+}
+
+/**
  * Helper function to find the primary token transfer, filtering out refunds and fees
  */
 function findPrimaryTokenAndAmount(
@@ -285,7 +309,7 @@ function findPrimaryTokenAndAmount(
  * Parse a swap or on-chain uniswapX transaction from the REST API
  */
 export function parseRestSwapTransaction(transaction: OnChainTransaction): ConfirmedSwapTransactionInfo | undefined {
-  const { transfers, chainId } = transaction
+  const { transfers, chainId, from: ownerAddress } = transaction
   if (transfers.length < 2) {
     return undefined
   }
@@ -297,12 +321,20 @@ export function parseRestSwapTransaction(transaction: OnChainTransaction): Confi
     return undefined
   }
 
-  const primarySent = findPrimaryTokenAndAmount(sentTransfers)
+  // Filter out FOT fee transfers before finding primary amounts
+  const filteredSentTransfers = excludeFOTFeeTransfers(sentTransfers, { ownerAddress, chainId, direction: 'sent' })
+  const filteredReceivedTransfers = excludeFOTFeeTransfers(receivedTransfers, {
+    ownerAddress,
+    chainId,
+    direction: 'received',
+  })
+
+  const primarySent = findPrimaryTokenAndAmount(filteredSentTransfers)
   if (!primarySent) {
     return undefined
   }
 
-  const primaryReceived = findPrimaryTokenAndAmount(receivedTransfers, primarySent.tokenAddress)
+  const primaryReceived = findPrimaryTokenAndAmount(filteredReceivedTransfers, primarySent.tokenAddress)
   if (!primaryReceived) {
     return undefined
   }

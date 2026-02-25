@@ -1,7 +1,7 @@
 import {
   CHART_BEHAVIOR,
   CHART_DIMENSIONS,
-} from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
+} from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
 
 /**
  * Calculate dynamic minimum zoom to fit all liquidity bars

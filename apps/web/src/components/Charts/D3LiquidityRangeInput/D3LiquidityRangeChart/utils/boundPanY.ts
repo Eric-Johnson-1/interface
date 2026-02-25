@@ -1,5 +1,5 @@
-import { CHART_DIMENSIONS } from 'components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
-import { ChartEntry } from 'components/Charts/LiquidityRangeInput/types'
+import { CHART_DIMENSIONS } from '~/components/Charts/D3LiquidityRangeInput/D3LiquidityRangeChart/constants'
+import { ChartEntry } from '~/components/Charts/LiquidityRangeInput/types'
 
 /**
  * Calculates bounded panY to prevent liquidity bars from underflowing the viewport

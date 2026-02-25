@@ -124,8 +124,7 @@ export function SmartWalletDisableModal({
               <RotatableChevron
                 color="$neutral3"
                 direction={isActiveNetworksExpanded ? 'up' : 'down'}
-                height={iconSizes.icon16}
-                width={iconSizes.icon16}
+                size="$icon.16"
               />
             </TouchableArea>
           ) : (

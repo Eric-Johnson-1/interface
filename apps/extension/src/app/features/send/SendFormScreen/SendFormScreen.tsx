@@ -21,6 +21,7 @@ import { LowNativeBalanceModal } from 'uniswap/src/features/transactions/modals/
 import { useIsBlocked } from 'uniswap/src/features/trm/hooks'
 import { CurrencyField } from 'uniswap/src/types/currency'
 import { createTransactionId } from 'uniswap/src/utils/createTransactionId'
+import { isSafeNumber } from 'utilities/src/primitives/integer'
 import { useBooleanState } from 'utilities/src/react/useBooleanState'
 import { useSendContext } from 'wallet/src/features/transactions/contexts/SendContext'
 import { GasFeeRow } from 'wallet/src/features/transactions/send/GasFeeRow'
@@ -123,6 +124,11 @@ export function SendFormScreen(): JSX.Element {
 
   const onSetExactAmount = useCallback(
     (amount: string) => {
+      // Omit parsing errors by checking if amount exceeds Number range limit
+      if (!isSafeNumber(amount)) {
+        return
+      }
+
       updateSendForm(isFiatInput ? { exactAmountFiat: amount } : { exactAmountToken: amount })
     },
     [isFiatInput, updateSendForm],
@@ -228,9 +234,7 @@ export function SendFormScreen(): JSX.Element {
               />
             )}
             <ReviewButton disabled={isButtonBlocked} onPress={onPressReview} />
-            {!warnings.insufficientGasFundsWarning && (
-              <GasFeeRow chainId={chainId as UniverseChainId} gasFee={gasFee} />
-            )}
+            {!warnings.insufficientGasFundsWarning && <GasFeeRow chainId={chainId} gasFee={gasFee} />}
             <InsufficientNativeTokenWarning flow="send" gasFee={gasFee} warnings={warnings.warnings} />
           </>
         )}

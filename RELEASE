@@ -1,6 +1,6 @@
 IPFS hash of the deployment:
-- CIDv0: `QmUstUwkcnN8d3riX9cA3Pv351yt9ZXxswTcGgXL1jTn6G`
-- CIDv1: `bafybeidbe2zszqdoyd6ohaf7dllup7xhbwvmewwh247y7imsko2o7wlx6u`
+- CIDv0: `QmPmdNUVNBpYCTEwd3ZGuBsstNv3UFksebFx4yDE5Dpaqi`
+- CIDv1: `bafybeiavigyzqlyual3cj6htkjjnjpdgiour4f2frt57nf4dbn5huu66qu`
 
 The latest release is always mirrored at [app.uniswap.org](https://app.uniswap.org).
 
@@ -10,69 +10,14 @@ You can also access the Uniswap Interface from an IPFS gateway.
 Your Uniswap settings are never remembered across different URLs.
 
 IPFS gateways:
-- https://bafybeidbe2zszqdoyd6ohaf7dllup7xhbwvmewwh247y7imsko2o7wlx6u.ipfs.dweb.link/
-- [ipfs://QmUstUwkcnN8d3riX9cA3Pv351yt9ZXxswTcGgXL1jTn6G/](ipfs://QmUstUwkcnN8d3riX9cA3Pv351yt9ZXxswTcGgXL1jTn6G/)
+- https://bafybeiavigyzqlyual3cj6htkjjnjpdgiour4f2frt57nf4dbn5huu66qu.ipfs.dweb.link/
+- [ipfs://QmPmdNUVNBpYCTEwd3ZGuBsstNv3UFksebFx4yDE5Dpaqi/](ipfs://QmPmdNUVNBpYCTEwd3ZGuBsstNv3UFksebFx4yDE5Dpaqi/)
 
-## 5.135.0 (2026-02-25)
-
-
-### Features
-
-* **web:** activity tab e2e tests (#26509) 999a605
-* **web:** add e2e tests for nfts tab (#26508) 47d1ea4
-* **web:** add new stats to TDP (#27994) c2fc858
-* **web:** add snapshot tests for web portfolio page (#26501) 8cc96cc
-* **web:** and tokens tab e2e tests (#26507) 78fcf9b
-* **web:** consolidate dev entry-gateway to staging URL and configure proxies (#28702) 27209c9
-* **web:** enable egw proxy in staging (#28745) 7119baf
-* **web:** make shared group hover transition component (#28711) d150437
-* **web:** portfolio page header e2e tests (#26506) f7c80a4
-* **web:** portfolio page overview e2e tests (#26510) b91c820
-* **web:** Search fee tier modal tooltip (#28605) 249f29b
-* **websocket:** add connection store with Zustand (#28722) 3be4aa1
-* **websocket:** add core types and backoff utility (#28721) f7c31f5
-* **websocket:** add subscription manager with reference counting (#28723) 49bf93e
-* **websocket:** add WebSocket client and documentation (#28724) adc4a40
+### 5.135.1 (2026-02-25)
 
 
 ### Bug Fixes
 
-* **web:** Add Experiments feature flag group (#28589) f56a294
-* **web:** add FilterStoreContextProvider to pools table in TDP (#28986) e808fb8
-* **web:** add UniswapIdentifier to DD logs (#28816) d8a1bab
-* **web:** cherry-pick #28900 (#5.134.2) (#29049) 3f427a1
-* **web:** cherry-pick #29043 (#5.134.1) (#29046) 4c35c16
-* **web:** cherry-pick #29053 (#5.134.2) (#29065) f6574b2
-* **web:** configure VITE_ENABLE_ENTRY_GATEWAY_PROXY in env files (#28849) e775c28
-* **web:** fix chained actions StepRowSkeleton text overflow (#28856) 47aab24
-* **web:** fix missing limit orders pagination bug on portfolio page (#28684) 1acdd42
-* **web:** fix text overflow in plan activity modal (#28863) 374a6c1
-* **web:** fix uniswapX cancellation (#28601) ec33f31
-* **web:** improve text color after clicking privacy and terms links (#28991) 17bb388
-* **web:** LP-609 fix bid markers disappearing in grouped distribution chart mode (#28548) f3a6051
-* **web:** make featured auction card grid responsive on mobile (#28761) a29ddce
-* **web:** proxy statsig config through /config (#28896) a3973f3
-* **web:** Remove WebFORNudges experiment (#28340) 38daabf
-* **web:** Render wrapped scroll button conditionally on web Tables (#28105) 1daa506
-* **web:** show active pools tab visually (#28987) 59bb58e
-* **web:** show exact output unavail warning for CA (#28858) cce3bf8
-* **web:** toucan tick grouping null value catch (#28270) 4bdb49b
-* **web:** unify multichain popover props and fix address popover padding (#28873) 1e766a3
-* **web:** use key when rendering OffchainActivityModal to keep react state per-order (#28971) b110c0b
-
-
-### Continuous Integration
-
-* **web:** update sitemaps cc6dfcb
-
-
-### Tests
-
-* **websocket:** add integration tests (#28725) 33a2174
-
-
-### Styles
-
-* **web:** add 2px gap between table header and body (#28693) 6d6864e
+* **web:** hotfix #29070 (#5.134.3) (#29073) 78ee400
 
 

@@ -41,6 +41,9 @@ const entryGatewayTradingFetchClientWithSession = createFetchClient({
       // Sessions are currently required for plans, so this is enabled by default. The flag exists as a safety net to disable sessions for plan if needed.
       getIsSessionServiceEnabled: () => !getFeatureFlag(FeatureFlags.DisableSessionsForPlan),
     }),
+  defaultOptions: {
+    credentials: 'include',
+  },
 })
 
 const BaseTradingApiSessionClient: PlanEndpoints = createTradingApiClient({
